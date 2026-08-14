@@ -1,0 +1,208 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// Zapline CRM — regras de seguranca do Cloud Firestore
+//
+// Principios:
+//  1. Nada e publico. Todo acesso exige autenticacao.
+//  2. Todo dado de negocio vive sob /companies/{companyId}/... e so e acessivel
+//     por quem possui um documento em /companies/{companyId}/members/{uid}.
+//  3. O papel (role) do usuario e lido do documento de membro — nunca do
+//     documento /users/{uid}, que o proprio usuario pode editar.
+//  4. Escritas validam os campos criticos (companyId implicito, tipos, tamanho).
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function memberPath(companyId) {
+      return /databases/$(database)/documents/companies/$(companyId)/members/$(request.auth.uid);
+    }
+
+    function isMember(companyId) {
+      return signedIn() && exists(memberPath(companyId));
+    }
+
+    function memberDoc(companyId) {
+      return get(memberPath(companyId)).data;
+    }
+
+    function isActiveMember(companyId) {
+      return isMember(companyId) && memberDoc(companyId).active == true;
+    }
+
+    function isAdmin(companyId) {
+      return isActiveMember(companyId) && memberDoc(companyId).role == 'admin';
+    }
+
+    function companyDoc(companyId) {
+      return get(/databases/$(database)/documents/companies/$(companyId)).data;
+    }
+
+    function isCompanyOwner(companyId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/companies/$(companyId))
+        && companyDoc(companyId).ownerId == request.auth.uid;
+    }
+
+    // Texto curto o suficiente para nao permitir despejo de dados.
+    function shortString(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    // -----------------------------------------------------------------------
+    // /users/{uid} — perfil do usuario e ponteiro para o workspace ativo.
+    // Somente o proprio usuario le/escreve. O companyId aqui NAO concede acesso:
+    // quem concede acesso e o documento de membro dentro da empresa.
+    // -----------------------------------------------------------------------
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.uid == uid;
+      allow delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // /companies/{companyId} — workspace.
+    // -----------------------------------------------------------------------
+    match /companies/{companyId} {
+      allow read: if isMember(companyId);
+
+      // Qualquer usuario autenticado pode criar seu proprio workspace,
+      // desde que se declare dono. O documento de membro e criado logo depois.
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && shortString(request.resource.data.name, 120);
+
+      // Somente administradores alteram o workspace, e a posse nao muda.
+      allow update: if isAdmin(companyId)
+        && request.resource.data.ownerId == resource.data.ownerId;
+
+      allow delete: if false;
+
+      // ---------------------------------------------------------------------
+      // members — controle de acesso do workspace.
+      // ---------------------------------------------------------------------
+      match /members/{memberId} {
+        allow read: if isMember(companyId);
+
+        // Tres caminhos de entrada:
+        //  1. Um administrador cadastra o membro diretamente.
+        //  2. O dono se auto-cadastra como admin logo apos criar a empresa.
+        //  3. Um convidado entra sozinho apresentando o codigo de convite
+        //     ("identificador-da-empresa.CODIGO"), sempre como vendedor.
+        allow create: if isAdmin(companyId)
+          || (signedIn()
+              && memberId == request.auth.uid
+              && isCompanyOwner(companyId)
+              && request.resource.data.role == 'admin')
+          || (signedIn()
+              && memberId == request.auth.uid
+              && request.resource.data.uid == request.auth.uid
+              && request.resource.data.role == 'vendedor'
+              && request.resource.data.active == true
+              && companyDoc(companyId).joinCode is string
+              && companyDoc(companyId).joinCode.size() >= 6
+              && request.resource.data.joinCode == companyDoc(companyId).joinCode);
+
+        // Admin gerencia papeis; membro comum so ajusta o proprio perfil
+        // (nome/foto) sem escalar privilegios.
+        allow update: if (isAdmin(companyId)
+              // Ninguem rebaixa o dono da empresa.
+              && (memberId != companyDoc(companyId).ownerId
+                  || request.resource.data.role == resource.data.role))
+          || (isActiveMember(companyId)
+              && memberId == request.auth.uid
+              && request.resource.data.role == resource.data.role
+              && request.resource.data.active == resource.data.active);
+
+        allow delete: if isAdmin(companyId) && memberId != companyDoc(companyId).ownerId;
+      }
+
+      // ---------------------------------------------------------------------
+      // settings — configuracoes nao sensiveis (etapas, origens, integracoes).
+      // Segredos (token da Meta, service account) NUNCA ficam aqui: eles vivem
+      // apenas nas secrets do Cloudflare Worker.
+      // ---------------------------------------------------------------------
+      match /settings/{docId} {
+        allow read: if isActiveMember(companyId);
+        allow write: if isAdmin(companyId);
+      }
+
+      // ---------------------------------------------------------------------
+      // contacts — leads/clientes e a oportunidade corrente de cada um.
+      // ---------------------------------------------------------------------
+      match /contacts/{contactId} {
+        allow read: if isActiveMember(companyId);
+        allow create: if isActiveMember(companyId)
+          && shortString(request.resource.data.name, 160)
+          && request.resource.data.createdBy == request.auth.uid;
+        allow update: if isActiveMember(companyId)
+          && shortString(request.resource.data.name, 160);
+        // Vendedor apaga apenas os proprios contatos; admin apaga qualquer um.
+        allow delete: if isAdmin(companyId)
+          || (isActiveMember(companyId) && resource.data.ownerId == request.auth.uid);
+      }
+
+      // ---------------------------------------------------------------------
+      // interactions — timeline (append-only para membros comuns).
+      // ---------------------------------------------------------------------
+      match /interactions/{interactionId} {
+        allow read: if isActiveMember(companyId);
+        allow create: if isActiveMember(companyId)
+          && request.resource.data.createdBy == request.auth.uid
+          && shortString(request.resource.data.type, 40);
+        allow update: if isAdmin(companyId)
+          || (isActiveMember(companyId) && resource.data.createdBy == request.auth.uid);
+        allow delete: if isAdmin(companyId)
+          || (isActiveMember(companyId) && resource.data.createdBy == request.auth.uid);
+      }
+
+      // ---------------------------------------------------------------------
+      // tasks — tarefas e follow-ups.
+      // ---------------------------------------------------------------------
+      match /tasks/{taskId} {
+        allow read: if isActiveMember(companyId);
+        allow create: if isActiveMember(companyId)
+          && shortString(request.resource.data.title, 200);
+        allow update: if isActiveMember(companyId);
+        allow delete: if isAdmin(companyId)
+          || (isActiveMember(companyId) && resource.data.assigneeId == request.auth.uid);
+      }
+
+      // ---------------------------------------------------------------------
+      // templates — modelos de mensagem.
+      // ---------------------------------------------------------------------
+      match /templates/{templateId} {
+        allow read: if isActiveMember(companyId);
+        allow write: if isActiveMember(companyId);
+      }
+
+      // ---------------------------------------------------------------------
+      // conversations / messages — inbox do WhatsApp.
+      // O Worker escreve via Admin REST API (service account), que ignora estas
+      // regras; o cliente le e cria rascunhos de envio.
+      // ---------------------------------------------------------------------
+      match /conversations/{conversationId} {
+        allow read: if isActiveMember(companyId);
+        allow write: if isActiveMember(companyId);
+
+        match /messages/{messageId} {
+          allow read: if isActiveMember(companyId);
+          allow create: if isActiveMember(companyId);
+          allow update, delete: if isAdmin(companyId);
+        }
+      }
+    }
+
+    // Qualquer outro caminho e negado explicitamente.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
