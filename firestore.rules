@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // ---------------------------------------------------------------------------
-// Zapline CRM — regras de seguranca do Cloud Firestore
+// Prox CRM — regras de seguranca do Cloud Firestore
 //
 // Principios:
 //  1. Nada e publico. Todo acesso exige autenticacao.

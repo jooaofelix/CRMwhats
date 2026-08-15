@@ -16,7 +16,7 @@ const ENV = {
   FIREBASE_PROJECT_ID: 'projeto-teste',
   WHATSAPP_VERIFY_TOKEN: 'frase-secreta',
   META_APP_SECRET: 'app-secret-teste',
-  ALLOWED_ORIGINS: 'https://zapline.pages.dev'
+  ALLOWED_ORIGINS: 'https://prox.pages.dev'
 };
 
 const ctx = { waitUntil: (promise) => { void promise; } };
@@ -129,13 +129,13 @@ test('GET /api/config entrega as credenciais públicas e deduz o authDomain', as
   const env = {
     ...ENV,
     FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
-    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_PROJECT_ID: 'prox-teste',
     FIREBASE_APP_ID: '1:000000000000:web:abc123'
   };
   const body = await (await worker.fetch(req('/api/config'), env, ctx)).json();
 
   assert.equal(body.firebase.apiKey, 'AIzaSyExemplo0000000000000000000000');
-  assert.equal(body.firebase.authDomain, 'zapline-teste.firebaseapp.com');
+  assert.equal(body.firebase.authDomain, 'prox-teste.firebaseapp.com');
   // Projetos novos usam .firebasestorage.app e antigos .appspot.com — deduzir
   // seria um chute; fica vazio até alguém informar explicitamente.
   assert.equal(body.firebase.storageBucket, '');
@@ -145,22 +145,22 @@ test('storageBucket informado é respeitado como veio', async () => {
   const env = {
     ...ENV,
     FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
-    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_PROJECT_ID: 'prox-teste',
     FIREBASE_APP_ID: '1:000000000000:web:abc123',
-    FIREBASE_STORAGE_BUCKET: 'zapline-teste.firebasestorage.app'
+    FIREBASE_STORAGE_BUCKET: 'prox-teste.firebasestorage.app'
   };
   const body = await (await worker.fetch(req('/api/config'), env, ctx)).json();
-  assert.equal(body.firebase.storageBucket, 'zapline-teste.firebasestorage.app');
+  assert.equal(body.firebase.storageBucket, 'prox-teste.firebasestorage.app');
 });
 
 test('GET /api/config nunca expõe segredos de servidor', async () => {
   const env = {
     ...ENV,
     FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
-    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_PROJECT_ID: 'prox-teste',
     FIREBASE_APP_ID: '1:000000000000:web:abc123',
     FIREBASE_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----segredo-----END PRIVATE KEY-----',
-    FIREBASE_CLIENT_EMAIL: 'sa@zapline-teste.iam.gserviceaccount.com',
+    FIREBASE_CLIENT_EMAIL: 'sa@prox-teste.iam.gserviceaccount.com',
     WHATSAPP_ACCESS_TOKEN: 'EAAG-token-da-meta'
   };
   const texto = await (await worker.fetch(req('/api/config'), env, ctx)).text();
@@ -179,11 +179,11 @@ test('config incompleta não é entregue pela metade', async () => {
 
 test('OPTIONS responde o preflight de CORS', async () => {
   const response = await worker.fetch(
-    req('/api/messages/send', { method: 'OPTIONS', headers: { Origin: 'https://zapline.pages.dev' } }),
+    req('/api/messages/send', { method: 'OPTIONS', headers: { Origin: 'https://prox.pages.dev' } }),
     ENV, ctx);
 
   assert.equal(response.status, 204);
-  assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://zapline.pages.dev');
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://prox.pages.dev');
 });
 
 test('CORS não libera origem fora da lista', async () => {
@@ -261,7 +261,7 @@ function envComAssets() {
       ASSETS: {
         fetch: (request) => {
           pedidos.push(new URL(request.url).pathname);
-          return new Response('<!doctype html><title>Zapline</title>', {
+          return new Response('<!doctype html><title>Prox</title>', {
             headers: { 'Content-Type': 'text/html' }
           });
         }
@@ -276,7 +276,7 @@ test('link profundo cai no index.html quando o Worker serve o frontend', async (
   const response = await worker.fetch(req('/algum/caminho'), env, ctx);
 
   assert.equal(response.status, 200);
-  assert.match(await response.text(), /Zapline/);
+  assert.match(await response.text(), /Prox/);
   assert.deepEqual(pedidos, ['/index.html']);
 });
 

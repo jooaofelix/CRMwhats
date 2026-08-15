@@ -1,9 +1,9 @@
 {
-  "name": "zapline-crm-e2e",
+  "name": "prox-crm-e2e",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Teste ponta a ponta do Zapline CRM em navegador real.",
+  "description": "Teste ponta a ponta do Prox CRM em navegador real.",
   "scripts": {
     "test": "node run.mjs"
   },

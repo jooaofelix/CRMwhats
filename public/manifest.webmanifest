@@ -1,6 +1,6 @@
 {
-  "name": "Zapline CRM",
-  "short_name": "Zapline",
+  "name": "Prox CRM",
+  "short_name": "Prox",
   "description": "Funil de vendas simples para quem vende pelo WhatsApp.",
   "start_url": "./index.html#/dashboard",
   "display": "standalone",

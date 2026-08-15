@@ -1,5 +1,5 @@
 /**
- * Zapline CRM — backend seguro (Cloudflare Worker).
+ * Prox CRM — backend seguro (Cloudflare Worker).
  *
  * Responsabilidades:
  *  1. Guardar as credenciais da Meta. O token NUNCA chega ao navegador.
@@ -321,7 +321,7 @@ function handleConfig(request, env) {
 async function handleHealth(request, env) {
   return json({
     status: 'ok',
-    service: 'zapline-crm-worker',
+    service: 'prox-crm-worker',
     firebaseConfigured: Boolean(env.FIREBASE_PROJECT_ID && env.FIREBASE_CLIENT_EMAIL && env.FIREBASE_PRIVATE_KEY),
     whatsappConfigured: Boolean(env.WHATSAPP_ACCESS_TOKEN && env.WHATSAPP_PHONE_NUMBER_ID),
     webhookConfigured: Boolean(env.WHATSAPP_VERIFY_TOKEN && env.META_APP_SECRET),

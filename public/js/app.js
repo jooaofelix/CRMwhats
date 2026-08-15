@@ -318,7 +318,7 @@ function setupOnboardingScreen() {
           userName
         });
       }
-      toastOk('Workspace pronto! Bem-vindo ao Zapline CRM.');
+      toastOk('Workspace pronto! Bem-vindo ao Prox CRM.');
       location.reload();
     } catch (err) {
       console.error('[onboarding]', err);

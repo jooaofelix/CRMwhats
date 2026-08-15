@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Zapline CRM — um Worker único que serve o frontend estático e a API.
+# Prox CRM — um Worker único que serve o frontend estático e a API.
 #
 # Fica na RAIZ do repositório de propósito: assim o build do Cloudflare
 # funciona com "Root directory = /" (o padrão) e "Deploy command =

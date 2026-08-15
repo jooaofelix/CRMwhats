@@ -1,4 +1,4 @@
-# Zapline CRM
+# Prox CRM
 
 Mini CRM SaaS de vendas e relacionamento pelo WhatsApp, para pequenas empresas,
 profissionais liberais, prestadores de serviço e equipes comerciais pequenas.
@@ -7,7 +7,7 @@ Ele resolve um problema específico: a empresa recebe contatos pelo WhatsApp,
 envia orçamentos, conversa — e perde vendas porque esquece de responder, de
 fazer follow-up ou de acompanhar em que etapa cada cliente está.
 
-O Zapline transforma esses contatos em um funil simples: etapas claras,
+O Prox transforma esses contatos em um funil simples: etapas claras,
 follow-up com hora marcada, alerta de cliente parado e visão do quanto está
 em negociação.
 

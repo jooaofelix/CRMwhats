@@ -30,7 +30,7 @@ export const firebaseConfig = {
 
 export const appConfig = {
   /** Nome exibido do produto. */
-  appName: 'Zapline CRM',
+  appName: 'Prox CRM',
 
   /**
    * Base das chamadas ao backend seguro (Cloudflare Worker).

@@ -65,7 +65,7 @@ async function render() {
   const runToken = ++token;
 
   highlightNav(route.name);
-  document.title = `${titleFor(route.name)} · Zapline CRM`;
+  document.title = `${titleFor(route.name)} · Prox CRM`;
 
   // Libera a view anterior antes de montar a proxima.
   if (currentView?.destroy) {
@@ -104,7 +104,7 @@ function titleFor(name) {
   return {
     dashboard: 'Dashboard', conversas: 'Conversas', contatos: 'Contatos', contato: 'Contato',
     funil: 'Funil', tarefas: 'Tarefas', relatorios: 'Relatórios', configuracoes: 'Configurações'
-  }[name] || 'Zapline CRM';
+  }[name] || 'Prox CRM';
 }
 
 export function startRouter(element) {

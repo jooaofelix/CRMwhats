@@ -1,5 +1,5 @@
 /**
- * Teste ponta a ponta do Zapline CRM.
+ * Teste ponta a ponta do Prox CRM.
  * Serve o site real com o SDK do Firebase trocado por um mock em memória,
  * e percorre o checklist do MVP num navegador de verdade.
  */
@@ -29,7 +29,7 @@ fs.writeFileSync(firebaseJs, fs.readFileSync(firebaseJs, 'utf8')
 const configJs = path.join(site, 'js', 'config.js');
 fs.writeFileSync(configJs, fs.readFileSync(configJs, 'utf8')
   .replace("apiKey: 'COLE_SUA_API_KEY'", "apiKey: 'AIzaSyTESTE-chave-de-teste-0000000000'")
-  .replace("projectId: 'SEU_PROJETO'", "projectId: 'zapline-teste'"));
+  .replace("projectId: 'SEU_PROJETO'", "projectId: 'prox-teste'"));
 
 /* --------------------------------------------------------- servidor ------ */
 
@@ -98,9 +98,9 @@ try {
         response.end(JSON.stringify({
           firebase: {
             apiKey: 'AIzaSyTESTE-chave-vinda-do-worker-000',
-            authDomain: 'zapline-teste.firebaseapp.com',
-            projectId: 'zapline-teste',
-            storageBucket: 'zapline-teste.appspot.com',
+            authDomain: 'prox-teste.firebaseapp.com',
+            projectId: 'prox-teste',
+            storageBucket: 'prox-teste.appspot.com',
             messagingSenderId: '000000000000',
             appId: '1:000000000000:web:abc123'
           }
