@@ -5,10 +5,14 @@
 
 /* ---------- 1. Tokens ---------- */
 :root {
-  --brand:        #4f46e5;
-  --brand-600:    #4338ca;
-  --brand-100:    #eef2ff;
-  --brand-soft:   #e0e7ff;
+  /* Cores da marca. O navy e o ciano vem direto do logotipo. */
+  --logo-navy:    #0e2260;
+  --logo-cyan:    #17b8d4;
+
+  --brand:        #0e2260;
+  --brand-600:    #071845;
+  --brand-100:    #e9edf7;
+  --brand-soft:   #cfd9ee;
 
   --accent:       #10b981;   /* ganho / positivo */
   --accent-100:   #d1fae5;
@@ -49,8 +53,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --brand-100:   #1e1b4b;
-    --brand-soft:  #2a2760;
+    /* O navy do logotipo desapareceria sobre o fundo escuro: no modo escuro a
+       cor primaria e uma versao elevada dele, mantendo a familia. */
+    --brand:       #3358c4;
+    --brand-600:   #4a6ed6;
+    --brand-100:   #182242;
+    --brand-soft:  #24325e;
     --accent-100:  #06301f;
     --warn-100:    #3a2a05;
     --danger-100:  #3a1414;
@@ -194,21 +202,52 @@ pre {
   --i-grip: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>');
 }
 
-/* ---------- 4. Marca ---------- */
-.brand { display: flex; align-items: center; gap: .55rem; }
-.brand__mark {
-  width: 30px; height: 30px; border-radius: 9px; flex: none;
-  background: linear-gradient(135deg, #6366f1, #22c1a4);
-  box-shadow: 0 3px 10px rgba(79, 70, 229, .35);
-  position: relative;
+/* ---------- 4. Marca ----------
+   A assinatura e "PRO" + o simbolo X, exatamente como o logotipo. O X e
+   desenhado com duas camadas de mascara (mesma tecnica dos icones), o que
+   permite recolori-lo por contexto — sobre o painel escuro do login, por
+   exemplo, o navy vira branco e so o ciano permanece.
+   Nos espacos pequenos (favicon, aba) usa-se assets/logo.svg, so o simbolo. */
+.brand { display: flex; align-items: baseline; gap: .04em; }
+
+.brand__word {
+  font-weight: 800; font-size: 1.32rem; letter-spacing: .01em; line-height: 1;
+  color: var(--logo-navy);
 }
-.brand__mark::after {
+
+.brand__x {
+  position: relative; display: inline-block; flex: none; font-size: 1.32rem;
+  /* Altura das maiusculas da Inter (~0.72em) para o X casar com "PRO"; a
+     largura sai da proporcao do desenho (79.2 / 68.8). O alinhamento pela
+     baseline do flex faz a base do X pousar na mesma linha das letras. */
+  height: .72em; width: .829em;
+}
+.brand__x::before, .brand__x::after {
   content: ""; position: absolute; inset: 0;
-  background: no-repeat center / 62% url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11l3.5-3.5"/><path d="M6 11h12"/><path d="M18 11l-3.5 3.5"/></svg>');
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
 }
-.brand__name { font-weight: 700; letter-spacing: -.02em; font-size: 1.02rem; }
-.brand__name span { color: var(--brand); }
-.brand--sm .brand__mark { width: 26px; height: 26px; border-radius: 8px; }
+.brand__x::before {
+  background: var(--logo-navy);
+  -webkit-mask-image: var(--i-logo-navy); mask-image: var(--i-logo-navy);
+}
+.brand__x::after {
+  background: var(--logo-cyan);
+  -webkit-mask-image: var(--i-logo-cyan); mask-image: var(--i-logo-cyan);
+}
+
+/* Sobre fundos escuros: a metade navy vira branca, o ciano continua. */
+.brand--invert .brand__word { color: #fff; }
+.brand--invert .brand__x::before { background: #fff; }
+
+.brand--sm .brand__word,
+.brand--sm .brand__x { font-size: 1.12rem; }
+
+:root {
+  --i-logo-navy: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="10.4 14.8 79.2 68.8"><path d="M10.4 14.8H32l28.8 34.4L32 83.6H10.4l28.8-34.4z"/></svg>');
+  --i-logo-cyan: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="10.4 14.8 79.2 68.8"><path d="M68 14.8h21.6L63.41 46.08 52.61 33.18z"/><path d="M68 83.6h21.6L63.41 52.32 52.61 65.22z"/></svg>');
+}
 
 /* ---------- 5. Botoes ---------- */
 .btn {
@@ -321,8 +360,10 @@ select { appearance: none; padding-right: 2rem;
   gap: 1rem; background: var(--bg); z-index: 60;
 }
 .boot__logo {
-  width: 42px; height: 42px; border-radius: 13px;
-  background: linear-gradient(135deg, #6366f1, #22c1a4); animation: pulse 1.3s ease-in-out infinite;
+  width: 46px; height: 46px;
+  background: var(--logo-navy); animation: pulse 1.3s ease-in-out infinite;
+  -webkit-mask: var(--i-logo-navy) no-repeat center / contain;
+  mask: var(--i-logo-navy) no-repeat center / contain;
 }
 .boot__text { color: var(--text-3); font-size: .88rem; margin: 0; }
 @keyframes pulse { 0%,100% { opacity: .45; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
@@ -332,7 +373,7 @@ select { appearance: none; padding-right: 2rem;
 
 .auth { min-height: 100dvh; display: grid; grid-template-columns: 1.05fr 1fr; }
 .auth__brand {
-  background: linear-gradient(150deg, #4338ca 0%, #4f46e5 42%, #14b8a6 130%);
+  background: linear-gradient(150deg, #0b1a4c 0%, #12306f 45%, var(--logo-cyan) 165%);
   color: #fff; padding: 3rem; display: flex; align-items: center; position: relative; overflow: hidden;
 }
 .auth__brand::after {
@@ -340,9 +381,7 @@ select { appearance: none; padding-right: 2rem;
   background: rgba(255,255,255,.08); right: -170px; bottom: -190px;
 }
 .auth__brandInner { max-width: 420px; position: relative; z-index: 1; }
-.auth__brand .brand__name { color: #fff; }
-.auth__brand .brand__name span { color: rgba(255,255,255,.72); }
-.auth__brand .brand__mark { background: rgba(255,255,255,.18); box-shadow: none; }
+/* O painel do login é navy: a assinatura entra invertida (ver .brand--invert). */
 .auth__brand h2 { font-size: 1.9rem; margin: 2rem 0 .9rem; line-height: 1.22; }
 .auth__brand p { color: rgba(255,255,255,.85); font-size: 1rem; }
 .auth__list { list-style: none; padding: 0; margin: 1.6rem 0 0; display: grid; gap: .6rem; }
@@ -609,7 +648,7 @@ table.data tbody tr:last-child td { border-bottom: 0; }
 .contact-hero__top { display: flex; gap: .8rem; align-items: center; }
 .contact-hero__avatar {
   width: 54px; height: 54px; border-radius: 16px; flex: none; display: grid; place-items: center;
-  background: linear-gradient(135deg, var(--brand), #22c1a4); color: #fff; font-weight: 700; font-size: 1.05rem;
+  background: linear-gradient(135deg, var(--brand), var(--logo-cyan)); color: #fff; font-weight: 700; font-size: 1.05rem;
 }
 .contact-hero__actions { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
 .contact-hero__actions .btn--wa { grid-column: 1 / -1; }
