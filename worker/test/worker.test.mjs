@@ -125,7 +125,7 @@ test('GET /api/config devolve null enquanto o Firebase não foi configurado', as
   assert.equal(body.firebase, null);
 });
 
-test('GET /api/config entrega as credenciais públicas e deduz os domínios', async () => {
+test('GET /api/config entrega as credenciais públicas e deduz o authDomain', async () => {
   const env = {
     ...ENV,
     FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
@@ -136,7 +136,21 @@ test('GET /api/config entrega as credenciais públicas e deduz os domínios', as
 
   assert.equal(body.firebase.apiKey, 'AIzaSyExemplo0000000000000000000000');
   assert.equal(body.firebase.authDomain, 'zapline-teste.firebaseapp.com');
-  assert.equal(body.firebase.storageBucket, 'zapline-teste.appspot.com');
+  // Projetos novos usam .firebasestorage.app e antigos .appspot.com — deduzir
+  // seria um chute; fica vazio até alguém informar explicitamente.
+  assert.equal(body.firebase.storageBucket, '');
+});
+
+test('storageBucket informado é respeitado como veio', async () => {
+  const env = {
+    ...ENV,
+    FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
+    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_APP_ID: '1:000000000000:web:abc123',
+    FIREBASE_STORAGE_BUCKET: 'zapline-teste.firebasestorage.app'
+  };
+  const body = await (await worker.fetch(req('/api/config'), env, ctx)).json();
+  assert.equal(body.firebase.storageBucket, 'zapline-teste.firebasestorage.app');
 });
 
 test('GET /api/config nunca expõe segredos de servidor', async () => {

@@ -20,12 +20,12 @@
  */
 
 export const firebaseConfig = {
-  apiKey: 'COLE_SUA_API_KEY',
-  authDomain: 'SEU_PROJETO.firebaseapp.com',
-  projectId: 'SEU_PROJETO',
-  storageBucket: 'SEU_PROJETO.appspot.com',
-  messagingSenderId: '000000000000',
-  appId: '1:000000000000:web:0000000000000000000000'
+  apiKey: 'AIzaSyB4Ftkb7caPy714MzutN0Y4ppVKKJpqsE8',
+  authDomain: 'crmwhats-8e739.firebaseapp.com',
+  projectId: 'crmwhats-8e739',
+  storageBucket: 'crmwhats-8e739.firebasestorage.app',
+  messagingSenderId: '628725369224',
+  appId: '1:628725369224:web:527335c090174a7f31523d'
 };
 
 export const appConfig = {

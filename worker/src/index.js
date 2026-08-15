@@ -302,10 +302,12 @@ function handleConfig(request, env) {
     appId: env.FIREBASE_APP_ID || ''
   };
 
-  // authDomain e storageBucket sao derivaveis do projectId: poupa duas variaveis.
-  if (firebase.projectId) {
-    if (!firebase.authDomain) firebase.authDomain = `${firebase.projectId}.firebaseapp.com`;
-    if (!firebase.storageBucket) firebase.storageBucket = `${firebase.projectId}.appspot.com`;
+  // authDomain segue sempre o padrao <projectId>.firebaseapp.com — deduzir
+  // poupa uma variavel. O storageBucket NAO e deduzido: projetos antigos usam
+  // <projectId>.appspot.com e os novos <projectId>.firebasestorage.app, e
+  // chutar errado seria pior do que deixar vazio (o CRM nao usa Storage).
+  if (firebase.projectId && !firebase.authDomain) {
+    firebase.authDomain = `${firebase.projectId}.firebaseapp.com`;
   }
 
   const configured = Boolean(firebase.apiKey && firebase.projectId && firebase.appId);

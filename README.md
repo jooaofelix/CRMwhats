@@ -160,9 +160,11 @@ Em *Workers & Pages › seu Worker › Settings › Variables and Secrets*, crie
 | `FIREBASE_PROJECT_ID` | `seu-projeto` |
 | `FIREBASE_APP_ID` | `1:000000000000:web:abc123` |
 
-`FIREBASE_AUTH_DOMAIN` e `FIREBASE_STORAGE_BUCKET` são deduzidos do
-`FIREBASE_PROJECT_ID` quando ausentes; `FIREBASE_MESSAGING_SENDER_ID` é
-opcional. O frontend lê tudo isso em `GET /api/config` no carregamento.
+`FIREBASE_AUTH_DOMAIN` é deduzido do `FIREBASE_PROJECT_ID` quando ausente.
+`FIREBASE_MESSAGING_SENDER_ID` e `FIREBASE_STORAGE_BUCKET` são opcionais — o
+CRM não usa Firebase Storage, e o sufixo do bucket varia entre projetos
+(`.appspot.com` nos antigos, `.firebasestorage.app` nos novos), então ele não
+é deduzido. O frontend lê tudo isso em `GET /api/config` no carregamento.
 
 É o caminho recomendado para produção: permite ambientes diferentes
 (homologação e produção) a partir do mesmo código.
@@ -460,7 +462,7 @@ Quando preenchido, tem prioridade sobre as variáveis do Worker.
 | `FIREBASE_PROJECT_ID` | Id do projeto. Usado também pela API para falar com o Firestore |
 | `FIREBASE_APP_ID` | Id do app Web (público) |
 | `FIREBASE_AUTH_DOMAIN` | Opcional — deduzido do `FIREBASE_PROJECT_ID` |
-| `FIREBASE_STORAGE_BUCKET` | Opcional — deduzido do `FIREBASE_PROJECT_ID` |
+| `FIREBASE_STORAGE_BUCKET` | Opcional — não é deduzido (o sufixo varia por projeto) |
 | `FIREBASE_MESSAGING_SENDER_ID` | Opcional |
 
 ### Worker — secrets (`wrangler secret put`, **nunca no Git**)
