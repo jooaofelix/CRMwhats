@@ -12,7 +12,7 @@
 #   qualquer outra rota   -> index.html (o frontend usa roteamento por hash)
 # ---------------------------------------------------------------------------
 
-name = "crmwhats"
+name = "prox"
 main = "worker/src/index.js"
 compatibility_date = "2025-01-01"
 

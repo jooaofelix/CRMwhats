@@ -37,7 +37,7 @@ export const appConfig = {
    *
    *   '/'   frontend e API no mesmo Worker (padrao deste projeto)
    *   URL   quando o frontend esta em outro dominio, ex.:
-   *         'https://crmwhats.seu-subdominio.workers.dev'
+   *         'https://prox.seu-subdominio.workers.dev'
    *   ''    sem backend: o CRM opera no "Nivel 1" e continua 100% funcional
    *         usando o atalho wa.me para abrir conversas no WhatsApp
    */

@@ -203,7 +203,7 @@ Em *Authentication › Sign-in method*, habilite:
 - **Google**
 
 Em *Authentication › Settings › Authorized domains*, adicione o domínio do
-Worker (`crmwhats.<sub>.workers.dev`) e o domínio próprio, se houver.
+Worker (`<nome-do-worker>.<sub>.workers.dev`) e o domínio próprio, se houver.
 
 ### Cloud Firestore
 
@@ -327,7 +327,7 @@ diferente do que você está olhando.
 npx wrangler deploy
 ```
 
-Depois do primeiro deploy, adicione o domínio (`crmwhats.<sub>.workers.dev` ou
+Depois do primeiro deploy, adicione o domínio (`<nome-do-worker>.<sub>.workers.dev` ou
 o seu domínio próprio) nos *Authorized domains* do Firebase Authentication, e
 aponte o frontend para a própria origem em `public/js/config.js`:
 
