@@ -1,0 +1,13 @@
+{
+  "name": "zapline-crm-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Teste ponta a ponta do Zapline CRM em navegador real.",
+  "scripts": {
+    "test": "node run.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

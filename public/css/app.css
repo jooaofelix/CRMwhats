@@ -105,6 +105,9 @@ pre {
 }
 
 .hidden { display: none !important; }
+/* Regras de componente com `display` explícito venceriam o [hidden] do
+   navegador (que é apenas display:none na folha do agente). */
+[hidden] { display: none !important; }
 .muted  { color: var(--text-2); }
 .dim    { color: var(--text-3); }
 .nowrap { white-space: nowrap; }

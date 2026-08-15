@@ -148,10 +148,13 @@ function contactRow(contact, sideHtml, { danger = false } = {}) {
 function panelFollowUps(m) {
   const rows = [];
 
+  // As linhas são <div role="button"> e não <button>: elas contêm o botão
+  // "Concluir", e um <button> dentro de outro é HTML inválido — o navegador
+  // desaninha os dois e quebra o layout.
   for (const task of m.overdue.slice(0, 6)) {
     const contact = task.contactId ? state.contacts.find((c) => c.id === task.contactId) : null;
     rows.push(`
-      <button class="itemrow" data-task-open="${esc(task.id)}" data-contact-id="${esc(task.contactId || '')}">
+      <div class="itemrow" role="button" tabindex="0" data-task-open="${esc(task.id)}" data-contact-id="${esc(task.contactId || '')}">
         <span class="itemrow__avatar" style="background:var(--danger-100);color:#b91c1c">${esc(initials(task.contactName || task.title))}</span>
         <span class="itemrow__main">
           <strong>${esc(task.contactName || task.title)}</strong>
@@ -160,13 +163,14 @@ function panelFollowUps(m) {
         <span class="itemrow__side">
           <span class="pill pill--danger">${esc(relativeTime(task._due))}</span>
           ${contact ? `<span class="dim">${esc(formatMoney(contact.value))}</span>` : ''}
+          <button class="btn btn--sm btn--ghost" data-task-done="${esc(task.id)}">Concluir</button>
         </span>
-      </button>`);
+      </div>`);
   }
 
   for (const task of m.today.slice(0, 8)) {
     rows.push(`
-      <button class="itemrow" data-task-open="${esc(task.id)}" data-contact-id="${esc(task.contactId || '')}">
+      <div class="itemrow" role="button" tabindex="0" data-task-open="${esc(task.id)}" data-contact-id="${esc(task.contactId || '')}">
         <span class="itemrow__avatar">${esc(initials(task.contactName || task.title))}</span>
         <span class="itemrow__main">
           <strong>${esc(task.contactName || task.title)}</strong>
@@ -176,7 +180,7 @@ function panelFollowUps(m) {
           <strong>${esc(formatTime(task._due))}</strong>
           <button class="btn btn--sm btn--ghost" data-task-done="${esc(task.id)}">Concluir</button>
         </span>
-      </button>`);
+      </div>`);
   }
 
   return `

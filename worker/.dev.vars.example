@@ -1,0 +1,13 @@
+# Copie para .dev.vars (que está no .gitignore) para rodar `wrangler dev` localmente.
+# Em produção estes valores devem ser gravados com `wrangler secret put NOME`.
+
+FIREBASE_PROJECT_ID="seu-projeto"
+FIREBASE_CLIENT_EMAIL="firebase-adminsdk-xxxxx@seu-projeto.iam.gserviceaccount.com"
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEv...\n-----END PRIVATE KEY-----\n"
+
+WHATSAPP_ACCESS_TOKEN="EAAG..."
+WHATSAPP_PHONE_NUMBER_ID="123456789012345"
+WHATSAPP_VERIFY_TOKEN="escolha-uma-frase-secreta"
+META_APP_SECRET="app-secret-do-painel-da-meta"
+
+ALLOWED_ORIGINS="http://localhost:5173"

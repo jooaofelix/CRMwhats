@@ -9,3 +9,5 @@ dist/
 *.log
 .firebase/
 serviceAccount*.json
+test/e2e/site/
+test/e2e/*.png

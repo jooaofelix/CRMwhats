@@ -1,0 +1,29 @@
+name = "zapline-crm-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# ---------------------------------------------------------------------------
+# Variaveis NAO sensiveis. Podem ficar versionadas.
+# ---------------------------------------------------------------------------
+[vars]
+# Versao da Graph API usada nas chamadas a WhatsApp Cloud API.
+GRAPH_API_VERSION = "v25.0"
+
+# Origens autorizadas a chamar a API (separadas por virgula).
+# Ex.: "https://zapline.pages.dev,https://crm.suaempresa.com.br"
+ALLOWED_ORIGINS = ""
+
+# ---------------------------------------------------------------------------
+# SEGREDOS — nunca coloque aqui. Configure com `wrangler secret put NOME`:
+#
+#   FIREBASE_PROJECT_ID       id do projeto Firebase
+#   FIREBASE_CLIENT_EMAIL     e-mail da service account
+#   FIREBASE_PRIVATE_KEY      chave privada da service account (com \n escapados)
+#   WHATSAPP_ACCESS_TOKEN     token permanente da Meta
+#   WHATSAPP_PHONE_NUMBER_ID  id do numero no WhatsApp Business
+#   WHATSAPP_VERIFY_TOKEN     string que voce escolhe e repete no painel da Meta
+#   META_APP_SECRET           app secret, usado para validar X-Hub-Signature-256
+# ---------------------------------------------------------------------------
+
+[observability]
+enabled = true
