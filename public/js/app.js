@@ -388,7 +388,60 @@ function setupShell({ auth, signOut, state, resetState, stopListeners }) {
     openContactModal();
   });
 
+  setupThemeSwitch();
   setupGlobalSearch(state);
+}
+
+/* --------------------------------------------------------------- tema ---- */
+
+const THEME_KEY = 'prox-theme';
+
+/**
+ * Claro, escuro ou o que o sistema pedir. A escolha grava em localStorage e
+ * e reaplicada por um script no <head>, antes da primeira pintura.
+ */
+function setupThemeSwitch() {
+  const group = document.getElementById('theme-switch');
+  if (!group) return;
+
+  const read = () => {
+    try { return localStorage.getItem(THEME_KEY) || 'system'; } catch { return 'system'; }
+  };
+
+  const apply = (theme) => {
+    if (theme === 'system') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme;
+
+    // A cor da barra do navegador no celular acompanha o tema.
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      const escuro = theme === 'dark'
+        || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      meta.setAttribute('content', escuro ? '#191c24' : '#1558d6');
+    }
+
+    group.querySelectorAll('[data-theme-set]').forEach((button) => {
+      button.classList.toggle('is-active', button.dataset.themeSet === theme);
+    });
+  };
+
+  group.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-theme-set]');
+    if (!button) return;
+    const theme = button.dataset.themeSet;
+    try {
+      if (theme === 'system') localStorage.removeItem(THEME_KEY);
+      else localStorage.setItem(THEME_KEY, theme);
+    } catch { /* modo privado: vale só para esta sessão */ }
+    apply(theme);
+  });
+
+  apply(read());
+
+  // No modo "sistema", acompanha a troca de tema do SO em tempo real.
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (read() === 'system') apply('system');
+  });
 }
 
 /* ------------------------------------------------------- busca global ---- */

@@ -406,6 +406,57 @@ try {
 
   await page.screenshot({ path: path.join(here, 'mobile.png'), fullPage: false });
   await page.setViewportSize({ width: 1360, height: 900 });
+
+  /* 26. seletor de tema */
+  await page.goto(`${BASE}#/dashboard`);
+  await page.waitForSelector('.kpis', { timeout: 8000 });
+  await page.click('#btn-user');
+  await page.waitForSelector('#theme-switch', { timeout: 5000 });
+
+  const temaAtual = () => page.evaluate(() => document.documentElement.dataset.theme || 'system');
+
+  await page.click('[data-theme-set="dark"]');
+  const escuro = await temaAtual();
+  await page.click('[data-theme-set="light"]');
+  const claro = await temaAtual();
+  await page.click('[data-theme-set="system"]');
+  const sistema = await temaAtual();
+
+  check('26. Seletor de tema alterna claro, escuro e sistema',
+    escuro === 'dark' && claro === 'light' && sistema === 'system',
+    `${escuro} / ${claro} / ${sistema}`);
+
+  const persistido = await page.evaluate(() => {
+    localStorage.setItem('prox-theme', 'dark');
+    return localStorage.getItem('prox-theme');
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForSelector('.kpis', { timeout: 10000 });
+  check('26b. Tema escolhido sobrevive ao recarregamento',
+    persistido === 'dark' && (await temaAtual()) === 'dark');
+
+  // A assinatura precisa continuar legível no escuro (era navy sobre preto).
+  const contraste = await page.evaluate(() => {
+    const word = document.querySelector('.brand__word');
+    const cor = getComputedStyle(word).color.match(/\d+/g).map(Number);
+    const fundo = getComputedStyle(document.body).backgroundColor.match(/\d+/g).map(Number);
+    const lum = ([r, g, b]) => {
+      const c = [r, g, b].map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+    const [a, b] = [lum(cor), lum(fundo)].sort((x, y) => y - x);
+    return (a + 0.05) / (b + 0.05);
+  });
+  check('26c. Assinatura legível no tema escuro (contraste ≥ 4.5:1)',
+    contraste >= 4.5, `${contraste.toFixed(1)}:1`);
+
+  await page.screenshot({ path: path.join(here, 'dark-dashboard.png') });
+  await page.evaluate(() => localStorage.removeItem('prox-theme'));
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForSelector('.kpis', { timeout: 10000 });
   await page.goto(`${BASE}#/funil`);
   await page.waitForSelector('.kcard', { timeout: 8000 });
   await page.screenshot({ path: path.join(here, 'desktop-funil.png') });

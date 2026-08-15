@@ -51,36 +51,84 @@
 
   --font: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
 
+  --ok-text:      #047857;
+  --warn-text:    #b45309;
+  --danger-text:  #b91c1c;
+
   --safe-b: env(safe-area-inset-bottom, 0px);
 }
 
+/* ---------- Tema escuro ----------
+   Os mesmos tokens aparecem em dois seletores, de propósito: o primeiro atende
+   quem deixa no automático (preferência do sistema) e o segundo atende a
+   escolha explícita feita no menu do usuário, que precisa vencer o automático.
+   Ao mexer em um, mexa no outro. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    /* O navy do logotipo desapareceria sobre o fundo escuro: no modo escuro a
-       cor primaria e uma versao elevada dele, mantendo a familia. */
-    --brand:       #4d8bff;
-    --brand-600:   #6ea3ff;
-    --brand-100:   #14224a;
-    --brand-soft:  #1e3268;
-    --accent-100:  #06301f;
-    --warn-100:    #3a2a05;
-    --danger-100:  #3a1414;
+  :root:not([data-theme="light"]) {
+    /* O navy do logotipo desapareceria sobre fundo escuro: a assinatura clareia. */
+    --logo-navy:   #e9eefa;
 
-    --bg:          #0e1017;
-    --surface:     #171a23;
-    --surface-2:   #1c202b;
-    --line:        #272b38;
-    --line-strong: #333949;
+    --brand:       #5b93ff;
+    --brand-600:   #7aa8ff;
+    --brand-100:   #1d2b4d;
+    --brand-soft:  #2a3c66;
+    --accent-100:  #0a3a28;
+    --warn-100:    #43310a;
+    --danger-100:  #451a1a;
 
-    --text:        #eef0f6;
-    --text-2:      #a3aabd;
-    --text-3:      #737b90;
+    --ok-text:     #6ee7b7;
+    --warn-text:   #fcd34d;
+    --danger-text: #fca5a5;
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, .4);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .45);
-    --shadow:    0 4px 16px rgba(0, 0, 0, .5);
-    --shadow-lg: 0 18px 48px rgba(0, 0, 0, .6);
+    /* Superfícies elevadas: preto puro deixa a leitura pesada. */
+    --bg:          #191c24;
+    --surface:     #21252f;
+    --surface-2:   #272c38;
+    --line:        #333846;
+    --line-strong: #454b5c;
+
+    --text:        #f0f2f7;
+    --text-2:      #aeb6c7;
+    --text-3:      #828a9c;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, .35);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .4);
+    --shadow:    0 4px 16px rgba(0, 0, 0, .45);
+    --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
   }
+}
+
+:root[data-theme="dark"] {
+    /* O navy do logotipo desapareceria sobre fundo escuro: a assinatura clareia. */
+    --logo-navy:   #e9eefa;
+
+    --brand:       #5b93ff;
+    --brand-600:   #7aa8ff;
+    --brand-100:   #1d2b4d;
+    --brand-soft:  #2a3c66;
+    --accent-100:  #0a3a28;
+    --warn-100:    #43310a;
+    --danger-100:  #451a1a;
+
+    --ok-text:     #6ee7b7;
+    --warn-text:   #fcd34d;
+    --danger-text: #fca5a5;
+
+    /* Superfícies elevadas: preto puro deixa a leitura pesada. */
+    --bg:          #191c24;
+    --surface:     #21252f;
+    --surface-2:   #272c38;
+    --line:        #333846;
+    --line-strong: #454b5c;
+
+    --text:        #f0f2f7;
+    --text-2:      #aeb6c7;
+    --text-3:      #828a9c;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, .35);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .4);
+    --shadow:    0 4px 16px rgba(0, 0, 0, .45);
+    --shadow-lg: 0 18px 48px rgba(0, 0, 0, .55);
 }
 
 /* ---------- 2. Base ---------- */
@@ -302,14 +350,11 @@ pre {
   border: 1px solid var(--line); white-space: nowrap;
 }
 .pill--brand  { background: var(--brand-100); color: var(--brand); border-color: transparent; }
-.pill--ok     { background: var(--accent-100); color: #047857; border-color: transparent; }
-.pill--warn   { background: var(--warn-100); color: #b45309; border-color: transparent; }
-.pill--danger { background: var(--danger-100); color: #b91c1c; border-color: transparent; }
+.pill--ok     { background: var(--accent-100); color: var(--ok-text); border-color: transparent; }
+.pill--warn   { background: var(--warn-100); color: var(--warn-text); border-color: transparent; }
+.pill--danger { background: var(--danger-100); color: var(--danger-text); border-color: transparent; }
 .pill--role   { text-transform: uppercase; font-size: .66rem; }
 .pill--stage  { border: 0; color: #fff; }
-@media (prefers-color-scheme: dark) {
-  .pill--ok { color: #6ee7b7; } .pill--warn { color: #fcd34d; } .pill--danger { color: #fca5a5; }
-}
 
 .tag {
   display: inline-flex; align-items: center; gap: .3rem;
@@ -349,9 +394,8 @@ select { appearance: none; padding-right: 2rem;
 
 .form__error {
   margin: 0; padding: .55rem .7rem; border-radius: 10px; font-size: .85rem;
-  background: var(--danger-100); color: #b91c1c;
+  background: var(--danger-100); color: var(--danger-text);
 }
-@media (prefers-color-scheme: dark) { .form__error { color: #fca5a5; } }
 
 .switchrow { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .5rem 0; }
 .checkline { display: flex; align-items: center; gap: .5rem; font-size: .9rem; }
@@ -851,3 +895,14 @@ table.data tbody tr:last-child td { border-bottom: 0; }
 
 @media print { .sidebar, .topbar, .tabbar { display: none !important; } .content { padding: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Seletor de tema, no menu do usuário. A interface segue o sistema por padrão;
+   esta escolha grava em localStorage e vence a preferência do sistema. */
+.usermenu__theme {
+  padding: .55rem .65rem .65rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: .3rem;
+  display: flex; flex-direction: column; gap: .35rem;
+}
+.usermenu__theme .segmented { width: 100%; }
+.usermenu__theme .segmented button { flex: 1; padding: .34rem .3rem; font-size: .78rem; }

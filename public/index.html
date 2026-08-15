@@ -14,6 +14,15 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link rel="stylesheet" href="css/app.css">
+<script>
+  // Aplica o tema escolhido antes da primeira pintura (evita piscar).
+  (function () {
+    try {
+      var t = localStorage.getItem('prox-theme');
+      if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+    } catch (e) { /* modo privado sem localStorage: segue o sistema */ }
+  })();
+</script>
 </head>
 <body>
 
@@ -230,6 +239,16 @@ FIREBASE_APP_ID       = 1:000000000000:web:abc123</pre>
             <span class="muted" id="user-email">—</span>
             <span class="pill pill--role" id="user-role">—</span>
           </div>
+
+          <div class="usermenu__theme">
+            <span class="kpi__label">Tema</span>
+            <div class="segmented" id="theme-switch" role="group" aria-label="Tema da interface">
+              <button type="button" data-theme-set="light">Claro</button>
+              <button type="button" data-theme-set="dark">Escuro</button>
+              <button type="button" data-theme-set="system">Sistema</button>
+            </div>
+          </div>
+
           <a href="#/configuracoes" class="usermenu__item">Configurações</a>
           <button class="usermenu__item" id="btn-signout">Sair</button>
         </div>
