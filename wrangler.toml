@@ -37,10 +37,27 @@ GRAPH_API_VERSION = "v25.0"
 ALLOWED_ORIGINS = ""
 
 # ---------------------------------------------------------------------------
+# Configuração pública do Firebase, servida ao navegador por GET /api/config.
+#
+# Preencher estas variáveis (aqui ou em Settings › Variables and Secrets, no
+# painel) configura a aplicação SEM editar código. Se preferir versionar os
+# valores, use public/js/config.js — ele tem prioridade sobre estas variáveis.
+#
+# São valores públicos: identificam o projeto e vão para o navegador de
+# qualquer usuário. Quem protege os dados são as regras do Firestore.
+#
+#   FIREBASE_API_KEY = "AIza..."
+#   FIREBASE_PROJECT_ID = "seu-projeto"
+#   FIREBASE_APP_ID = "1:000000000000:web:abc123"
+#
+# Opcionais (AUTH_DOMAIN e STORAGE_BUCKET são deduzidos do PROJECT_ID):
+#   FIREBASE_AUTH_DOMAIN, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
 # SEGREDOS — nunca coloque aqui. Configure com `wrangler secret put NOME`
 # (ou em Settings › Variables and Secrets, no painel):
 #
-#   FIREBASE_PROJECT_ID       id do projeto Firebase
 #   FIREBASE_CLIENT_EMAIL     e-mail da service account
 #   FIREBASE_PRIVATE_KEY      chave privada da service account (com \n escapados)
 #   WHATSAPP_ACCESS_TOKEN     token permanente da Meta

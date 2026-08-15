@@ -11,3 +11,4 @@ dist/
 serviceAccount*.json
 test/e2e/site/
 test/e2e/*.png
+test/e2e/site-sem-config/

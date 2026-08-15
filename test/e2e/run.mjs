@@ -82,6 +82,52 @@ const waitToast = async (fragment, timeout = 6000) => {
 };
 
 try {
+  /* 0. configuração vinda das variáveis do Worker (sem editar config.js) */
+  {
+    const siteSemConfig = path.join(here, 'site-sem-config');
+    fs.rmSync(siteSemConfig, { recursive: true, force: true });
+    fs.cpSync(site, siteSemConfig, { recursive: true });
+    // Devolve o config.js aos valores de exemplo do repositório.
+    fs.cpSync(path.join(repo, 'public', 'js', 'config.js'),
+      path.join(siteSemConfig, 'js', 'config.js'));
+
+    const servidor = http.createServer((request, response) => {
+      const rota = decodeURIComponent(request.url.split('?')[0]);
+      if (rota === '/api/config') {
+        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify({
+          firebase: {
+            apiKey: 'AIzaSyTESTE-chave-vinda-do-worker-000',
+            authDomain: 'zapline-teste.firebaseapp.com',
+            projectId: 'zapline-teste',
+            storageBucket: 'zapline-teste.appspot.com',
+            messagingSenderId: '000000000000',
+            appId: '1:000000000000:web:abc123'
+          }
+        }));
+        return;
+      }
+      let arquivo = path.join(siteSemConfig, rota === '/' ? 'index.html' : rota);
+      if (!fs.existsSync(arquivo) || fs.statSync(arquivo).isDirectory()) {
+        arquivo = path.join(siteSemConfig, 'index.html');
+      }
+      response.writeHead(200, { 'Content-Type': MIME[path.extname(arquivo)] || 'application/octet-stream' });
+      response.end(fs.readFileSync(arquivo));
+    });
+    await new Promise((r) => servidor.listen(4175, r));
+
+    const aba = await context.newPage();
+    await aba.goto('http://127.0.0.1:4175', { waitUntil: 'networkidle' });
+    let bootou = true;
+    try {
+      await aba.waitForSelector('#auth-screen:not(.hidden)', { timeout: 10000 });
+    } catch { bootou = false; }
+    check('0. App inicia com as credenciais vindas do Worker (config.js vazio)', bootou,
+      bootou ? '' : await aba.locator('#setup-screen').innerText().catch(() => 'sem tela'));
+    await aba.close();
+    servidor.close();
+  }
+
   /* 1. carregar + tela de login */
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.waitForSelector('#auth-screen:not(.hidden)', { timeout: 10000 });

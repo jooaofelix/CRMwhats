@@ -117,6 +117,52 @@ test('GET /api/health informa o que está configurado, sem vazar segredos', asyn
   assert.ok(!serialized.includes('frase-secreta'), 'não pode expor o verify token');
 });
 
+test('GET /api/config devolve null enquanto o Firebase não foi configurado', async () => {
+  const response = await worker.fetch(req('/api/config'), ENV, ctx);
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.firebase, null);
+});
+
+test('GET /api/config entrega as credenciais públicas e deduz os domínios', async () => {
+  const env = {
+    ...ENV,
+    FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
+    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_APP_ID: '1:000000000000:web:abc123'
+  };
+  const body = await (await worker.fetch(req('/api/config'), env, ctx)).json();
+
+  assert.equal(body.firebase.apiKey, 'AIzaSyExemplo0000000000000000000000');
+  assert.equal(body.firebase.authDomain, 'zapline-teste.firebaseapp.com');
+  assert.equal(body.firebase.storageBucket, 'zapline-teste.appspot.com');
+});
+
+test('GET /api/config nunca expõe segredos de servidor', async () => {
+  const env = {
+    ...ENV,
+    FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000',
+    FIREBASE_PROJECT_ID: 'zapline-teste',
+    FIREBASE_APP_ID: '1:000000000000:web:abc123',
+    FIREBASE_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----segredo-----END PRIVATE KEY-----',
+    FIREBASE_CLIENT_EMAIL: 'sa@zapline-teste.iam.gserviceaccount.com',
+    WHATSAPP_ACCESS_TOKEN: 'EAAG-token-da-meta'
+  };
+  const texto = await (await worker.fetch(req('/api/config'), env, ctx)).text();
+
+  for (const segredo of ['segredo', 'iam.gserviceaccount.com', 'EAAG-token-da-meta',
+    'app-secret-teste', 'frase-secreta']) {
+    assert.ok(!texto.includes(segredo), `vazou: ${segredo}`);
+  }
+});
+
+test('config incompleta não é entregue pela metade', async () => {
+  const env = { ...ENV, FIREBASE_API_KEY: 'AIzaSyExemplo0000000000000000000000' };
+  const body = await (await worker.fetch(req('/api/config'), env, ctx)).json();
+  assert.equal(body.firebase, null, 'sem projectId/appId o app não conseguiria iniciar');
+});
+
 test('OPTIONS responde o preflight de CORS', async () => {
   const response = await worker.fetch(
     req('/api/messages/send', { method: 'OPTIONS', headers: { Origin: 'https://zapline.pages.dev' } }),

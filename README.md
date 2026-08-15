@@ -148,7 +148,30 @@ Authorized domains*.
 
 1. Crie um projeto em <https://console.firebase.google.com>.
 2. Adicione um app **Web** e copie o objeto de configuração.
-3. Cole os valores em `public/js/config.js`:
+3. Informe os valores à aplicação por **um** dos dois caminhos abaixo.
+
+### Opção A — variáveis do Worker (sem editar código)
+
+Em *Workers & Pages › seu Worker › Settings › Variables and Secrets*, crie:
+
+| Variável | Exemplo |
+|---|---|
+| `FIREBASE_API_KEY` | `AIza...` |
+| `FIREBASE_PROJECT_ID` | `seu-projeto` |
+| `FIREBASE_APP_ID` | `1:000000000000:web:abc123` |
+
+`FIREBASE_AUTH_DOMAIN` e `FIREBASE_STORAGE_BUCKET` são deduzidos do
+`FIREBASE_PROJECT_ID` quando ausentes; `FIREBASE_MESSAGING_SENDER_ID` é
+opcional. O frontend lê tudo isso em `GET /api/config` no carregamento.
+
+É o caminho recomendado para produção: permite ambientes diferentes
+(homologação e produção) a partir do mesmo código.
+
+### Opção B — no repositório
+
+Cole os valores em `public/js/config.js` e faça o commit. Este arquivo tem
+**prioridade** sobre as variáveis do Worker, o que é prático no
+desenvolvimento local:
 
 ```js
 export const firebaseConfig = {
@@ -349,6 +372,7 @@ No painel, os mesmos segredos ficam em *Settings › Variables and Secrets*.
 | Método | Rota | Descrição |
 |---|---|---|
 | `GET` | `/api/health` | Diagnóstico: diz o que está configurado, sem expor segredos |
+| `GET` | `/api/config` | Configuração pública do Firebase para o frontend |
 | `POST` | `/api/messages/send` | Envio pela Cloud API. Exige `Authorization: Bearer <Firebase ID token>` |
 | `GET` | `/webhook/:companyId` | Verificação do webhook (`hub.challenge`) |
 | `POST` | `/webhook/:companyId` | Eventos da Meta (assinatura obrigatória) |
@@ -414,7 +438,9 @@ antes de atualizar.
 
 ## Variáveis de ambiente e secrets
 
-### Frontend — `public/js/config.js` (público, versionado)
+### Frontend — `public/js/config.js` (público, versionado, opcional)
+
+Quando preenchido, tem prioridade sobre as variáveis do Worker.
 
 | Chave | Descrição |
 |---|---|
@@ -430,12 +456,17 @@ antes de atualizar.
 |---|---|
 | `GRAPH_API_VERSION` | Versão da Graph API (padrão `v25.0`) |
 | `ALLOWED_ORIGINS` | Origens autorizadas no CORS. Vazio quando frontend e API estão no mesmo Worker |
+| `FIREBASE_API_KEY` | Chave Web do Firebase (pública) |
+| `FIREBASE_PROJECT_ID` | Id do projeto. Usado também pela API para falar com o Firestore |
+| `FIREBASE_APP_ID` | Id do app Web (público) |
+| `FIREBASE_AUTH_DOMAIN` | Opcional — deduzido do `FIREBASE_PROJECT_ID` |
+| `FIREBASE_STORAGE_BUCKET` | Opcional — deduzido do `FIREBASE_PROJECT_ID` |
+| `FIREBASE_MESSAGING_SENDER_ID` | Opcional |
 
 ### Worker — secrets (`wrangler secret put`, **nunca no Git**)
 
 | Secret | Descrição |
 |---|---|
-| `FIREBASE_PROJECT_ID` | Id do projeto Firebase |
 | `FIREBASE_CLIENT_EMAIL` | E-mail da service account |
 | `FIREBASE_PRIVATE_KEY` | Chave privada da service account (`\n` escapados) |
 | `WHATSAPP_ACCESS_TOKEN` | Token permanente da Meta |

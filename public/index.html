@@ -21,12 +21,46 @@
 
 <!-- Tela de configuracao ausente (Firebase nao preenchido) -->
 <div id="setup-screen" class="setup hidden">
-  <div class="setup__card card">
-    <h1>Configuração necessária</h1>
-    <p>O arquivo <code>public/js/config.js</code> ainda está com valores de exemplo.
-       Preencha as credenciais públicas do seu projeto Firebase para iniciar.</p>
-    <pre id="setup-snippet"></pre>
-    <p class="muted">Passo a passo completo no <strong>README.md</strong> do repositório.</p>
+  <div class="setup__card card card--pad">
+    <span class="pill pill--brand">Falta configurar</span>
+    <h1 style="margin:.6rem 0 .4rem">Conecte seu projeto Firebase</h1>
+    <p class="muted">
+      Crie um projeto em <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a>,
+      adicione um app <strong>Web</strong> e copie os valores de <code>firebaseConfig</code>.
+      Depois escolha um dos caminhos abaixo. São chaves públicas: quem protege os
+      dados são as regras do Firestore.
+    </p>
+
+    <h2 style="margin-top:1.4rem">Opção 1 — pelo painel do Cloudflare <span class="pill pill--ok">sem código</span></h2>
+    <p class="muted">
+      Em <em>Workers &amp; Pages › seu Worker › Settings › Variables and Secrets</em>,
+      crie estas variáveis e implante de novo:
+    </p>
+    <pre>FIREBASE_API_KEY      = AIza...
+FIREBASE_PROJECT_ID   = seu-projeto
+FIREBASE_APP_ID       = 1:000000000000:web:abc123</pre>
+    <p class="muted" style="font-size:.85rem">
+      Opcionais: <code>FIREBASE_AUTH_DOMAIN</code>, <code>FIREBASE_STORAGE_BUCKET</code> e
+      <code>FIREBASE_MESSAGING_SENDER_ID</code> — os dois primeiros são deduzidos do
+      <code>FIREBASE_PROJECT_ID</code> quando ausentes.
+    </p>
+
+    <h2 style="margin-top:1.4rem">Opção 2 — no repositório</h2>
+    <p class="muted">Preencha <code>public/js/config.js</code> e faça o commit:</p>
+    <pre>export const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto",
+  storageBucket: "seu-projeto.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:abc123"
+};</pre>
+
+    <p class="muted" style="margin-top:1.2rem">
+      Depois, em <em>Firebase › Authentication</em>: habilite <strong>E-mail/senha</strong> e
+      <strong>Google</strong>, e adicione este domínio em <em>Settings › Authorized domains</em>.
+      Passo a passo completo no <strong>README.md</strong>.
+    </p>
   </div>
 </div>
 

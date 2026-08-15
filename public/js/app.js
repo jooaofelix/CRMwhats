@@ -2,7 +2,7 @@
  * Ponto de entrada: configuracao, autenticacao, montagem do shell e router.
  */
 
-import { firebaseConfig, isConfigured } from './config.js';
+import { resolveConfig } from './config.js';
 import { toast, toastOk, toastError, describeError } from './ui.js';
 import { esc, initials, debounce, norm, onlyDigits, formatPhone } from './utils.js';
 import { ROLE_LABEL, PLANS } from './defaults.js';
@@ -18,21 +18,18 @@ const hide = (element) => element?.classList.add('hidden');
 
 /* ------------------------------------------------------- pre-flight ------ */
 
-if (!isConfigured()) {
-  hide(boot);
-  show(setupScreen);
-  document.getElementById('setup-snippet').textContent =
-`// public/js/config.js
-export const firebaseConfig = {
-  apiKey: "AIza...",
-  authDomain: "${firebaseConfig.projectId}.firebaseapp.com",
-  projectId: "seu-projeto",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:abc123"
-};`;
-} else {
-  start().catch((err) => {
+// A configuração pode vir deste repositório (config.js) ou das variáveis do
+// Worker (/api/config) — por isso a checagem é assíncrona.
+resolveConfig()
+  .then((configured) => {
+    if (!configured) {
+      hide(boot);
+      show(setupScreen);
+      return;
+    }
+    return start();
+  })
+  .catch((err) => {
     console.error('[app] falha na inicialização', err);
     hide(boot);
     document.body.insertAdjacentHTML('afterbegin',
@@ -42,7 +39,6 @@ export const firebaseConfig = {
         <button class="btn btn--primary" onclick="location.reload()">Tentar novamente</button>
       </div></div>`);
   });
-}
 
 /* -------------------------------------------------------- bootstrap ------ */
 

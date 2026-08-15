@@ -284,6 +284,38 @@ async function processWebhook(env, companyId, payload) {
 
 /* --------------------------------------------------------------- rotas -- */
 
+/**
+ * Configuracao publica do Firebase, vinda das variaveis do Worker.
+ *
+ * Permite configurar a aplicacao pelo painel do Cloudflare, sem editar codigo
+ * nem fazer deploy. Sao valores publicos por natureza (identificam o projeto);
+ * quem protege os dados sao as regras do Firestore. Nenhum segredo de servidor
+ * — token da Meta, app secret, chave da service account — passa por aqui.
+ */
+function handleConfig(request, env) {
+  const firebase = {
+    apiKey: env.FIREBASE_API_KEY || '',
+    authDomain: env.FIREBASE_AUTH_DOMAIN || '',
+    projectId: env.FIREBASE_PROJECT_ID || '',
+    storageBucket: env.FIREBASE_STORAGE_BUCKET || '',
+    messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || '',
+    appId: env.FIREBASE_APP_ID || ''
+  };
+
+  // authDomain e storageBucket sao derivaveis do projectId: poupa duas variaveis.
+  if (firebase.projectId) {
+    if (!firebase.authDomain) firebase.authDomain = `${firebase.projectId}.firebaseapp.com`;
+    if (!firebase.storageBucket) firebase.storageBucket = `${firebase.projectId}.appspot.com`;
+  }
+
+  const configured = Boolean(firebase.apiKey && firebase.projectId && firebase.appId);
+
+  return json(
+    { firebase: configured ? firebase : null },
+    { request, env, headers: { 'Cache-Control': 'public, max-age=60' } }
+  );
+}
+
 async function handleHealth(request, env) {
   return json({
     status: 'ok',
@@ -405,6 +437,7 @@ export default {
 
     try {
       if (pathname === '/api/health') return handleHealth(request, env);
+      if (pathname === '/api/config') return handleConfig(request, env);
 
       if (pathname === '/api/messages/send' && request.method === 'POST') {
         return await handleSend(request, env);

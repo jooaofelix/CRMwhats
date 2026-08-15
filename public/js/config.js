@@ -56,8 +56,47 @@ export const appConfig = {
   contactsPageSize: 500
 };
 
-/** Indica se o config.js ja foi preenchido com valores reais. */
+/** Indica se ja temos credenciais reais do Firebase (deste arquivo ou do Worker). */
 export function isConfigured() {
   const key = firebaseConfig.apiKey || '';
   return key.length > 20 && !key.startsWith('COLE_') && !firebaseConfig.projectId.startsWith('SEU_');
+}
+
+/** De onde vieram as credenciais em uso — usado na tela de configuracao. */
+export let configSource = 'nenhuma';
+
+/**
+ * Resolve a configuracao do Firebase em duas etapas:
+ *
+ *  1. valores preenchidos neste arquivo (bom para desenvolvimento local);
+ *  2. senao, GET /api/config no Worker, que devolve as variaveis de ambiente
+ *     FIREBASE_API_KEY, FIREBASE_PROJECT_ID e FIREBASE_APP_ID.
+ *
+ * A segunda opcao permite configurar a aplicacao pelo painel do Cloudflare,
+ * sem editar codigo nem refazer deploy.
+ *
+ * @returns {Promise<boolean>} true quando ha credenciais utilizaveis
+ */
+export async function resolveConfig() {
+  if (isConfigured()) {
+    configSource = 'config.js';
+    return true;
+  }
+
+  const base = (appConfig.workerUrl || '').replace(/\/$/, '');
+  try {
+    const response = await fetch(`${base}/api/config`, { headers: { Accept: 'application/json' } });
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    if (!data?.firebase?.apiKey) return false;
+
+    // Mutação proposital: firebase.js lê este mesmo objeto ao inicializar.
+    Object.assign(firebaseConfig, data.firebase);
+    configSource = 'variáveis do Worker';
+    return isConfigured();
+  } catch (err) {
+    console.warn('[config] não foi possível obter a configuração do Worker', err);
+    return false;
+  }
 }
