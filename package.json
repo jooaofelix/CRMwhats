@@ -5,11 +5,14 @@
   "type": "module",
   "description": "Mini CRM SaaS de vendas e relacionamento pelo WhatsApp.",
   "scripts": {
-    "dev": "npx serve public",
+    "dev": "wrangler dev",
+    "dev:static": "npx serve public",
     "test": "node --test worker/test/worker.test.mjs",
-    "deploy:pages": "wrangler pages deploy public --project-name zapline-crm",
-    "deploy:worker": "cd worker && wrangler deploy",
+    "deploy": "wrangler deploy",
     "deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   },
   "license": "UNLICENSED"
 }

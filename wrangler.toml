@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Zapline CRM — um Worker único que serve o frontend estático e a API.
+#
+# Fica na RAIZ do repositório de propósito: assim o build do Cloudflare
+# funciona com "Root directory = /" (o padrão) e "Deploy command =
+# npx wrangler deploy", sem nenhum ajuste extra no painel.
+#
+# Roteamento:
+#   /                     -> public/index.html      (arquivo estático)
+#   /css/*, /js/*, ...    -> arquivos de public/    (servidos sem invocar o Worker)
+#   /api/*, /webhook/*    -> worker/src/index.js
+#   qualquer outra rota   -> index.html (o frontend usa roteamento por hash)
+# ---------------------------------------------------------------------------
+
+name = "crmwhats"
+main = "worker/src/index.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "public"
+binding = "ASSETS"
+# "none": o Worker decide o que fazer com rotas não encontradas. Não use
+# "single-page-application" aqui — ele responderia index.html também para
+# /api/* e /webhook/*, engolindo a API.
+not_found_handling = "none"
+
+# ---------------------------------------------------------------------------
+# Variáveis NÃO sensíveis. Podem ficar versionadas.
+# ---------------------------------------------------------------------------
+[vars]
+# Versão da Graph API usada nas chamadas à WhatsApp Cloud API.
+GRAPH_API_VERSION = "v25.0"
+
+# Origens autorizadas a chamar a API (separadas por vírgula).
+# Com frontend e API no mesmo Worker, as chamadas são de mesma origem e isto
+# pode ficar vazio. Preencha apenas se hospedar o frontend em outro domínio.
+ALLOWED_ORIGINS = ""
+
+# ---------------------------------------------------------------------------
+# SEGREDOS — nunca coloque aqui. Configure com `wrangler secret put NOME`
+# (ou em Settings › Variables and Secrets, no painel):
+#
+#   FIREBASE_PROJECT_ID       id do projeto Firebase
+#   FIREBASE_CLIENT_EMAIL     e-mail da service account
+#   FIREBASE_PRIVATE_KEY      chave privada da service account (com \n escapados)
+#   WHATSAPP_ACCESS_TOKEN     token permanente da Meta
+#   WHATSAPP_PHONE_NUMBER_ID  id do número no WhatsApp Business
+#   WHATSAPP_VERIFY_TOKEN     string que você escolhe e repete no painel da Meta
+#   META_APP_SECRET           app secret, valida o X-Hub-Signature-256
+# ---------------------------------------------------------------------------
+
+[observability]
+enabled = true

@@ -185,9 +185,67 @@ test('envio sem autenticação é recusado com 401', async () => {
   assert.match((await response.json()).error, /Autenticação/);
 });
 
-test('rota desconhecida devolve 404', async () => {
+test('rota desconhecida devolve 404 quando não há frontend no Worker', async () => {
   const response = await worker.fetch(req('/qualquer-coisa'), ENV, ctx);
   assert.equal(response.status, 404);
+});
+
+/* ------------------------------------ Worker servindo também o frontend -- */
+
+/** Simula o binding [assets] do wrangler.toml. */
+function envComAssets() {
+  const pedidos = [];
+  return {
+    env: {
+      ...ENV,
+      ASSETS: {
+        fetch: (request) => {
+          pedidos.push(new URL(request.url).pathname);
+          return new Response('<!doctype html><title>Zapline</title>', {
+            headers: { 'Content-Type': 'text/html' }
+          });
+        }
+      }
+    },
+    pedidos
+  };
+}
+
+test('link profundo cai no index.html quando o Worker serve o frontend', async () => {
+  const { env, pedidos } = envComAssets();
+  const response = await worker.fetch(req('/algum/caminho'), env, ctx);
+
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /Zapline/);
+  assert.deepEqual(pedidos, ['/index.html']);
+});
+
+test('rota /api/* desconhecida não vira index.html', async () => {
+  const { env, pedidos } = envComAssets();
+  const response = await worker.fetch(req('/api/inexistente'), env, ctx);
+
+  assert.equal(response.status, 404);
+  assert.equal((await response.json()).error, 'Rota não encontrada.');
+  assert.deepEqual(pedidos, [], 'a API nunca deve ser respondida com HTML');
+});
+
+test('POST em rota desconhecida não devolve HTML', async () => {
+  const { env, pedidos } = envComAssets();
+  const response = await worker.fetch(req('/algum/caminho', { method: 'POST' }), env, ctx);
+
+  assert.equal(response.status, 404);
+  assert.deepEqual(pedidos, []);
+});
+
+test('webhook continua funcionando com o frontend no mesmo Worker', async () => {
+  const { env, pedidos } = envComAssets();
+  const response = await worker.fetch(
+    req('/webhook/studio-xpto?hub.mode=subscribe&hub.verify_token=frase-secreta&hub.challenge=999'),
+    env, ctx);
+
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), '999');
+  assert.deepEqual(pedidos, []);
 });
 
 test('webhook de workspace com id inválido não é roteado', async () => {

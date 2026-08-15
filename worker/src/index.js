@@ -417,6 +417,13 @@ export default {
         if (request.method === 'POST') return await handleWebhookEvent(request, env, ctx, companyId);
       }
 
+      // Rotas fora da API: quando o Worker também serve o frontend (binding
+      // ASSETS), os arquivos existentes já foram entregues antes de chegar
+      // aqui — então isto só atende links profundos, devolvendo o app.
+      if (env.ASSETS && request.method === 'GET' && !pathname.startsWith('/api/')) {
+        return env.ASSETS.fetch(new Request(new URL('/index.html', url.origin), request));
+      }
+
       return json({ error: 'Rota não encontrada.' }, { status: 404, request, env });
     } catch (err) {
       const status = err.status || 500;

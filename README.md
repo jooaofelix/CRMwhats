@@ -25,7 +25,7 @@ em negociação.
   - [Regras de segurança](#regras-de-segurança)
   - [Índices](#índices)
 - [Modelo de dados](#modelo-de-dados)
-- [Deploy no Cloudflare Pages](#deploy-no-cloudflare-pages)
+- [Deploy no Cloudflare](#deploy-no-cloudflare)
 - [Cloudflare Worker (backend seguro)](#cloudflare-worker-backend-seguro)
 - [WhatsApp Cloud API](#whatsapp-cloud-api)
 - [Variáveis de ambiente e secrets](#variáveis-de-ambiente-e-secrets)
@@ -67,8 +67,8 @@ nenhuma configuração — veja [WhatsApp Cloud API](#whatsapp-cloud-api).
   de build. O navegador carrega os módulos direto.
 - **Autenticação:** Firebase Authentication (e-mail/senha e Google).
 - **Banco:** Cloud Firestore, com cache local persistente.
-- **Hospedagem:** Cloudflare Pages (estático).
-- **Backend seguro:** Cloudflare Worker (WhatsApp Cloud API e webhooks).
+- **Hospedagem:** Cloudflare Workers — o mesmo Worker serve os arquivos
+  estáticos e a API (WhatsApp Cloud API e webhooks).
 - **Versionamento:** Git/GitHub.
 
 Não há dependências de runtime no frontend: o SDK do Firebase é carregado por
@@ -80,11 +80,10 @@ CDN (`gstatic.com`) como módulo ES.
 
 ```
 .
-├── public/                    # tudo que vai para o Cloudflare Pages
+├── public/                    # frontend estático servido pelo Worker
 │   ├── index.html             # shell da aplicação (login, onboarding e app)
 │   ├── manifest.webmanifest
-│   ├── _headers               # cabeçalhos de segurança do Pages
-│   ├── _redirects             # fallback de SPA
+│   ├── _headers               # cabeçalhos de segurança
 │   ├── assets/logo.svg
 │   ├── css/app.css            # design system completo (tokens, componentes, telas)
 │   └── js/
@@ -108,9 +107,10 @@ CDN (`gstatic.com`) como módulo ES.
 │   ├── src/index.js           # rotas: /api/health, /api/messages/send, /webhook/:id
 │   ├── src/firestore.js       # cliente REST do Firestore (service account)
 │   ├── src/jwt.js             # verificação de ID token, OAuth2 e HMAC da Meta
-│   ├── test/worker.test.mjs   # testes sem rede (node --test)
-│   ├── wrangler.toml
-│   └── .dev.vars.example
+│   └── test/worker.test.mjs   # testes sem rede (node --test)
+│
+├── wrangler.toml              # Worker + assets estáticos (fica na raiz)
+├── .dev.vars.example          # modelo dos segredos para desenvolvimento local
 │
 ├── firestore.rules            # regras de segurança
 ├── firestore.indexes.json     # índices compostos
@@ -121,17 +121,20 @@ CDN (`gstatic.com`) como módulo ES.
 
 ## Rodando localmente
 
-Requisito: qualquer servidor estático. **Não abra `index.html` pelo `file://`** —
-módulos ES exigem HTTP.
+**Não abra `index.html` pelo `file://`** — módulos ES exigem HTTP.
 
 ```bash
 # 1. Preencha public/js/config.js com as credenciais do seu projeto Firebase
-# 2. Suba um servidor estático na pasta public/
-npx serve public
-#   ou:  python3 -m http.server 5173 --directory public
+# 2. Suba o Worker com o frontend junto (igual à produção)
+npm install
+npm run dev
+
+# Só o frontend, sem a API:
+npm run dev:static
 ```
 
-Acesse `http://localhost:5173`.
+Acesse a URL que o `wrangler dev` imprimir (normalmente
+`http://localhost:8787`).
 
 Se o `config.js` ainda estiver com os valores de exemplo, a aplicação mostra uma
 tela explicando o que preencher, em vez de quebrar.
@@ -171,7 +174,7 @@ Em *Authentication › Sign-in method*, habilite:
 - **Google**
 
 Em *Authentication › Settings › Authorized domains*, adicione o domínio do
-Pages (`seu-projeto.pages.dev`) e o domínio próprio, se houver.
+Worker (`crmwhats.<sub>.workers.dev`) e o domínio próprio, se houver.
 
 ### Cloud Firestore
 
@@ -251,29 +254,61 @@ servidor responde.
 
 ---
 
-## Deploy no Cloudflare Pages
+## Deploy no Cloudflare
 
-Pelo painel: *Workers & Pages › Create › Pages › Connect to Git*.
+Frontend e API vivem **no mesmo Worker**: um projeto, um domínio e nenhuma
+configuração de CORS. O `wrangler.toml` fica na raiz do repositório justamente
+para que o build do Cloudflare funcione com as opções padrão.
+
+```
+/                    → public/index.html        (arquivo estático)
+/css/*, /js/*, …     → arquivos de public/      (servidos sem invocar o Worker)
+/api/*, /webhook/*   → worker/src/index.js
+```
+
+### Pelo painel (deploy automático a cada push)
+
+*Workers & Pages › Create › Workers › Connect to Git*:
 
 | Configuração | Valor |
 |---|---|
-| Framework preset | `None` |
-| Build command | *(vazio — não há build)* |
-| Build output directory | `public` |
 | Root directory | `/` |
+| Build command | *(vazio — não há build)* |
+| Deploy command | `npx wrangler deploy` |
+| Branch | o branch de produção do repositório (ex.: `main`) |
 
-Por linha de comando:
+O nome do Worker vem do campo `name` do `wrangler.toml` e **precisa bater com o
+nome do projeto** no painel — se divergirem, o deploy publica um Worker
+diferente do que você está olhando.
+
+### Por linha de comando
 
 ```bash
-npm install -g wrangler
-wrangler pages deploy public --project-name zapline-crm
+npx wrangler deploy
 ```
 
-Depois do primeiro deploy, adicione o domínio do Pages nos *Authorized domains*
-do Firebase Authentication.
+Depois do primeiro deploy, adicione o domínio (`crmwhats.<sub>.workers.dev` ou
+o seu domínio próprio) nos *Authorized domains* do Firebase Authentication, e
+aponte o frontend para a própria origem em `public/js/config.js`:
 
-Os arquivos `public/_headers` (cabeçalhos de segurança) e `public/_redirects`
-(fallback de SPA) já vão junto.
+```js
+export const appConfig = {
+  workerUrl: '/',   // mesma origem: frontend e API no mesmo Worker
+  // …
+};
+```
+
+O arquivo `public/_headers` (cabeçalhos de segurança) é aplicado
+automaticamente. Não existe `_redirects`: o frontend usa roteamento por hash
+(`#/dashboard`), então o servidor só recebe `/` — e um `_redirects` com
+`/* → /index.html` engoliria as rotas `/api/*`.
+
+### Hospedando o frontend separado (opcional)
+
+Se preferir servir o frontend pelo Cloudflare Pages, aponte o projeto para o
+diretório `public` e configure `appConfig.workerUrl` com a URL completa do
+Worker. Nesse caso preencha `ALLOWED_ORIGINS` no `wrangler.toml` com o domínio
+do Pages, senão o navegador bloqueia as chamadas por CORS.
 
 ---
 
@@ -283,7 +318,6 @@ O Worker existe por um motivo: **o token da Meta não pode ficar no navegador**.
 Todo envio pela Cloud API e todo webhook passam por ele.
 
 ```bash
-cd worker
 npm install
 
 # Segredos (um comando por valor — eles nunca vão para o Git)
@@ -305,16 +339,10 @@ serviço › Gerar nova chave privada*. Do JSON baixado você usa `project_id`,
 `.gitignore`.
 
 Para desenvolvimento local, copie `.dev.vars.example` para `.dev.vars` e rode
-`npm run dev`.
+`npm run dev` — o `wrangler dev` sobe o frontend e a API juntos, como em
+produção.
 
-Por fim, aponte o frontend para o Worker em `public/js/config.js`:
-
-```js
-export const appConfig = {
-  workerUrl: 'https://zapline-crm-api.seu-subdominio.workers.dev',
-  // …
-};
-```
+No painel, os mesmos segredos ficam em *Settings › Variables and Secrets*.
 
 ### Endpoints
 
@@ -391,7 +419,7 @@ antes de atualizar.
 | Chave | Descrição |
 |---|---|
 | `firebaseConfig.*` | Configuração Web do Firebase (pública por natureza) |
-| `appConfig.workerUrl` | URL do Worker. Vazio = opera só no nível 1 |
+| `appConfig.workerUrl` | `'/'` quando o Worker serve o frontend; URL completa se estiverem separados; vazio = opera só no nível 1 |
 | `appConfig.defaultCountryCode` | DDI padrão dos links do WhatsApp (`55`) |
 | `appConfig.defaultStaleDays` | Dias sem interação para marcar um lead como parado |
 | `appConfig.contactsPageSize` | Teto de contatos carregados em memória |
@@ -401,7 +429,7 @@ antes de atualizar.
 | Chave | Descrição |
 |---|---|
 | `GRAPH_API_VERSION` | Versão da Graph API (padrão `v25.0`) |
-| `ALLOWED_ORIGINS` | Origens autorizadas no CORS, separadas por vírgula |
+| `ALLOWED_ORIGINS` | Origens autorizadas no CORS. Vazio quando frontend e API estão no mesmo Worker |
 
 ### Worker — secrets (`wrangler secret put`, **nunca no Git**)
 

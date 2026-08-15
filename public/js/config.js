@@ -33,12 +33,15 @@ export const appConfig = {
   appName: 'Zapline CRM',
 
   /**
-   * URL publica do Cloudflare Worker (backend seguro).
-   * Deixe vazio para operar no "Nivel 1" — o CRM continua 100% funcional
-   * usando o atalho wa.me para abrir conversas no WhatsApp.
-   * Ex.: 'https://zapline-api.seu-subdominio.workers.dev'
+   * Base das chamadas ao backend seguro (Cloudflare Worker).
+   *
+   *   '/'   frontend e API no mesmo Worker (padrao deste projeto)
+   *   URL   quando o frontend esta em outro dominio, ex.:
+   *         'https://crmwhats.seu-subdominio.workers.dev'
+   *   ''    sem backend: o CRM opera no "Nivel 1" e continua 100% funcional
+   *         usando o atalho wa.me para abrir conversas no WhatsApp
    */
-  workerUrl: '',
+  workerUrl: '/',
 
   /** DDI padrao usado ao montar links do WhatsApp (55 = Brasil). */
   defaultCountryCode: '55',
