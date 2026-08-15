@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Página de apresentação (apresentacao.html)
+   Reaproveita os tokens e componentes de app.css — aqui só o que é exclusivo
+   da página pública.
+   ========================================================================== */
+
+body.landing { background: var(--surface); }
+
+.lp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
+
+/* ---------- topo ---------- */
+.lp-nav {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.lp-nav__inner {
+  display: flex; align-items: center; gap: 1rem;
+  height: 66px; max-width: 1120px; margin: 0 auto; padding: 0 1.25rem;
+}
+.lp-nav__links { display: flex; gap: 1.3rem; margin-left: auto; }
+.lp-nav__links a { color: var(--text-2); font-size: .92rem; font-weight: 550; }
+.lp-nav__links a:hover { color: var(--brand); }
+@media (max-width: 780px) { .lp-nav__links { display: none; } }
+
+/* ---------- herói ---------- */
+.lp-hero { padding: 4.5rem 0 2.5rem; text-align: center; }
+.lp-hero h1 {
+  font-size: clamp(2rem, 5.2vw, 3.4rem); line-height: 1.08;
+  letter-spacing: -.03em; margin-bottom: 1rem;
+}
+.lp-hero h1 em { font-style: normal; color: var(--brand); }
+.lp-hero p {
+  font-size: clamp(1rem, 2.1vw, 1.18rem); color: var(--text-2);
+  max-width: 620px; margin: 0 auto 1.8rem;
+}
+.lp-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+.lp-note { margin-top: 1rem; font-size: .84rem; color: var(--text-3); }
+
+/* ---------- moldura das capturas ---------- */
+.lp-shot {
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow-lg); background: var(--surface);
+  line-height: 0;
+}
+.lp-shot img { width: 100%; height: auto; display: block; }
+.lp-hero .lp-shot { margin-top: 3rem; }
+
+/* ---------- seções ---------- */
+.lp-section { padding: 3.6rem 0; border-top: 1px solid var(--line); }
+.lp-section__head { max-width: 660px; margin: 0 auto 2.2rem; text-align: center; }
+.lp-section__head h2 {
+  font-size: clamp(1.4rem, 3.2vw, 2rem); letter-spacing: -.025em; margin-bottom: .6rem;
+}
+.lp-section__head p { color: var(--text-2); margin: 0; }
+
+.lp-eyebrow {
+  display: inline-block; font-size: .74rem; font-weight: 700; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--brand); margin-bottom: .7rem;
+}
+
+/* problema: três dores lado a lado */
+.lp-pains { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.lp-pain { padding: 1.4rem; }
+.lp-pain strong { display: block; margin-bottom: .35rem; font-size: 1rem; }
+.lp-pain p { margin: 0; font-size: .92rem; color: var(--text-2); }
+.lp-pain__icon {
+  width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--danger-100); color: var(--danger-text); margin-bottom: .9rem;
+}
+
+/* recurso: texto de um lado, captura do outro */
+.lp-feature {
+  display: grid; grid-template-columns: 1fr 1.25fr; gap: 2.6rem;
+  align-items: center; padding: 2.6rem 0;
+}
+.lp-feature + .lp-feature { border-top: 1px solid var(--line); }
+.lp-feature:nth-child(even) .lp-feature__text { order: 2; }
+.lp-feature h3 { font-size: 1.32rem; letter-spacing: -.02em; margin-bottom: .6rem; }
+.lp-feature p { color: var(--text-2); margin-bottom: .9rem; }
+.lp-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.lp-list li { display: flex; gap: .55rem; align-items: flex-start; font-size: .93rem; }
+.lp-list li::before {
+  content: ""; flex: none; width: 18px; height: 18px; margin-top: 2px; border-radius: 50%;
+  background: var(--accent-100) no-repeat center / 11px
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23059669" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>');
+}
+@media (max-width: 860px) {
+  .lp-feature { grid-template-columns: 1fr; gap: 1.5rem; }
+  .lp-feature:nth-child(even) .lp-feature__text { order: 0; }
+}
+
+/* celular: captura estreita ao lado do texto */
+.lp-mobile { display: grid; grid-template-columns: 300px 1fr; gap: 3rem; align-items: center; }
+.lp-mobile .lp-shot { border-radius: var(--radius-xl); }
+@media (max-width: 860px) {
+  .lp-mobile { grid-template-columns: 1fr; gap: 1.6rem; }
+  .lp-mobile .lp-shot { max-width: 300px; margin: 0 auto; }
+}
+
+/* passos */
+.lp-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+.lp-step { padding: 1.4rem; }
+.lp-step__n {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brand); color: #fff; font-weight: 700; font-size: .85rem; margin-bottom: .8rem;
+}
+.lp-step strong { display: block; margin-bottom: .3rem; }
+.lp-step p { margin: 0; font-size: .92rem; color: var(--text-2); }
+
+/* chamada final */
+.lp-cta {
+  text-align: center; padding: 3.4rem 1.5rem; border-radius: var(--radius-xl);
+  background: linear-gradient(150deg, #0e2260 0%, #1558d6 62%, var(--logo-cyan) 150%);
+  color: #fff; margin: 3.5rem 0;
+}
+.lp-cta h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); margin-bottom: .6rem; letter-spacing: -.02em; }
+.lp-cta p { color: rgba(255,255,255,.86); max-width: 520px; margin: 0 auto 1.6rem; }
+.lp-cta .btn { background: #fff; border-color: #fff; color: #0e2260; }
+.lp-cta .btn:hover { background: rgba(255,255,255,.9); border-color: rgba(255,255,255,.9); }
+
+/* rodapé */
+.lp-foot {
+  border-top: 1px solid var(--line); padding: 2rem 0 3rem;
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  color: var(--text-3); font-size: .86rem;
+}
+.lp-foot .spacer { flex: 1; }

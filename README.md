@@ -82,10 +82,12 @@ CDN (`gstatic.com`) como módulo ES.
 .
 ├── public/                    # frontend estático servido pelo Worker
 │   ├── index.html             # shell da aplicação (login, onboarding e app)
+│   ├── apresentacao.html      # página pública: o que é o sistema, com prints
 │   ├── manifest.webmanifest
 │   ├── _headers               # cabeçalhos de segurança
-│   ├── assets/                # logo.svg (símbolo) + PNGs gerados do ícone
+│   ├── assets/                # logo.svg, PNGs do ícone e prints de tour/
 │   ├── css/app.css            # design system completo (tokens, componentes, telas)
+│   ├── css/landing.css        # exclusivo da página de apresentação
 │   └── js/
 │       ├── config.js          # CONFIGURAÇÃO — preencha aqui (só dados públicos)
 │       ├── firebase.js        # inicialização e reexport do SDK
@@ -532,6 +534,13 @@ garantia de que `/api/config` não vaza segredos de servidor.
 A validação de `firestore.indexes.json` roda junto: formato, ausência de
 índices de campo único, duplicatas, e a checagem de que toda consulta com
 filtro + ordenação tem um índice correspondente declarado.
+
+**Página de apresentação:** `public/apresentacao.html` explica o sistema para
+quem ainda não tem conta, com capturas reais das telas. Ela é linkada da tela
+de login e fica em `/apresentacao.html`. Os prints saem de
+`node test/e2e/gen-tour.mjs`, que sobe o app com os dados de demonstração e
+fotografa cada tela — rode de novo depois de mudanças visuais, para a
+apresentação não descrever uma interface que não existe mais.
 
 **Ícones:** os PNGs de `public/assets/` são gerados do `logo.svg` com
 `node test/e2e/gen-icons.mjs`. Ao trocar o logotipo, rode esse comando e

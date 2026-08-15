@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1558d6">
+<meta name="description" content="Prox CRM — transforme as conversas do WhatsApp em um funil de vendas organizado: etapas claras, follow-up na hora certa e alerta de cliente parado.">
+<title>Prox CRM — como funciona</title>
+<link rel="icon" href="assets/logo.svg?v=2" type="image/svg+xml">
+<link rel="icon" href="assets/icon-32.png?v=2" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-180.png?v=2">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Prox CRM — nenhuma venda perdida por esquecimento">
+<meta property="og:description" content="O funil de vendas de quem atende pelo WhatsApp. Simples de usar, no computador e no celular.">
+<meta property="og:image" content="assets/tour/dashboard.png">
+
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/landing.css">
+<script>
+  // Mesma preferência de tema usada no sistema.
+  (function () {
+    try {
+      var t = localStorage.getItem('prox-theme');
+      if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body class="landing">
+
+<header class="lp-nav">
+  <div class="lp-nav__inner">
+    <a href="apresentacao.html" class="brand" role="img" aria-label="Prox CRM" style="text-decoration:none">
+      <span class="brand__word" aria-hidden="true">PRO</span>
+      <span class="brand__x" aria-hidden="true"></span>
+    </a>
+    <nav class="lp-nav__links">
+      <a href="#recursos">Recursos</a>
+      <a href="#comecar">Como começar</a>
+      <a href="#seguranca">Segurança</a>
+    </nav>
+    <a class="btn btn--primary btn--sm" href="index.html">Acessar o sistema</a>
+  </div>
+</header>
+
+<main>
+  <!-- ---------------------------------------------------------- herói -->
+  <section class="lp-hero lp-wrap">
+    <span class="lp-eyebrow">CRM para quem vende pelo WhatsApp</span>
+    <h1>Nenhuma venda perdida<br>por <em>esquecimento</em>.</h1>
+    <p>
+      Você atende pelo WhatsApp, envia orçamento, conversa — e a venda esfria porque
+      ninguém lembrou de retornar. O Prox transforma essas conversas em um funil
+      organizado, com follow-up na hora certa.
+    </p>
+    <div class="lp-actions">
+      <a class="btn btn--primary btn--lg" href="index.html">Começar agora — é grátis</a>
+      <a class="btn btn--lg" href="#recursos">Ver como funciona</a>
+    </div>
+    <p class="lp-note">Não precisa instalar nada. Funciona no computador e no celular.</p>
+
+    <div class="lp-shot">
+      <img src="assets/tour/dashboard.png" width="1440" height="900"
+           alt="Painel do Prox CRM mostrando follow-ups do dia, clientes sem retorno e o valor total do funil.">
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- problema -->
+  <section class="lp-section lp-wrap">
+    <div class="lp-section__head">
+      <h2>O que costuma acontecer sem um funil</h2>
+      <p>Não é falta de cliente. É a conversa que se perde no meio de dezenas de outras.</p>
+    </div>
+
+    <div class="lp-pains">
+      <article class="card lp-pain">
+        <div class="lp-pain__icon"><span data-icon="clock"></span></div>
+        <strong>“Esqueci de responder”</strong>
+        <p>O cliente pediu para retornar na sexta. Sexta chegou e passou, e a mensagem
+           ficou soterrada por outras conversas.</p>
+      </article>
+      <article class="card lp-pain">
+        <div class="lp-pain__icon"><span data-icon="alert"></span></div>
+        <strong>“Em que pé estava mesmo?”</strong>
+        <p>Sem histórico, cada retomada começa do zero — e o cliente percebe que
+           você não lembra do que combinaram.</p>
+      </article>
+      <article class="card lp-pain">
+        <div class="lp-pain__icon"><span data-icon="money"></span></div>
+        <strong>“Quanto tenho em negociação?”</strong>
+        <p>As propostas enviadas estão espalhadas no histórico do WhatsApp, sem
+           nenhuma soma no fim do mês.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- recursos -->
+  <section class="lp-section lp-wrap" id="recursos">
+    <div class="lp-section__head">
+      <span class="lp-eyebrow">Recursos</span>
+      <h2>Tudo o que você precisa, e nada além disso</h2>
+      <p>As telas abaixo são do sistema real, com dados de demonstração.</p>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature__text">
+        <h3>Abra o dia sabendo quem responder</h3>
+        <p>O painel responde de cara as perguntas que importam: quem precisa de
+           follow-up hoje, quem está atrasado e quais negociações pararam.</p>
+        <ul class="lp-list">
+          <li>Follow-ups de hoje e atrasados, em destaque</li>
+          <li>Alerta de cliente sem retorno há X dias</li>
+          <li>Valor do funil, vendas do mês e taxa de conversão</li>
+        </ul>
+      </div>
+      <div class="lp-shot">
+        <img src="assets/tour/dashboard.png" width="1440" height="900" loading="lazy"
+             alt="Painel com indicadores do mês, lista de follow-ups e resumo do funil por etapa.">
+      </div>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature__text">
+        <h3>Arraste o card, o funil se atualiza</h3>
+        <p>Cada negociação é um card. Mova entre as etapas e o sistema grava sozinho,
+           registrando a mudança no histórico do cliente.</p>
+        <ul class="lp-list">
+          <li>Etapas configuráveis — use os nomes da sua operação</li>
+          <li>Valor somado por coluna, para saber onde está o dinheiro</li>
+          <li>No celular, um toque abre as ações rápidas do card</li>
+        </ul>
+      </div>
+      <div class="lp-shot">
+        <img src="assets/tour/funil.png" width="1440" height="900" loading="lazy"
+             alt="Funil em kanban com colunas de etapa e cards de negociação mostrando valor e responsável.">
+      </div>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature__text">
+        <h3>Todo o histórico do cliente em um lugar</h3>
+        <p>Ligações, mensagens, reuniões e propostas ficam numa linha do tempo.
+           Antes de retomar a conversa, você lê em dez segundos o que já aconteceu.</p>
+        <ul class="lp-list">
+          <li>Botão que abre a conversa direto no WhatsApp</li>
+          <li>Modelos de mensagem com o nome do cliente já preenchido</li>
+          <li>Valor, responsável, origem, tags e próxima ação</li>
+        </ul>
+      </div>
+      <div class="lp-shot">
+        <img src="assets/tour/contato.png" width="1440" height="900" loading="lazy"
+             alt="Ficha de um cliente com dados, botão de abrir no WhatsApp e a linha do tempo das interações.">
+      </div>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature__text">
+        <h3>Follow-up com hora marcada</h3>
+        <p>Ao terminar um atendimento, escolha “amanhã”, “em 3 dias” ou uma data.
+           A tarefa é criada e aparece no painel no dia certo.</p>
+        <ul class="lp-list">
+          <li>Atalhos de 1, 2, 3, 7 ou 15 dias</li>
+          <li>Prioridade, responsável e observação</li>
+          <li>Separação clara entre hoje, atrasadas e a semana</li>
+        </ul>
+      </div>
+      <div class="lp-shot">
+        <img src="assets/tour/tarefas.png" width="1440" height="900" loading="lazy"
+             alt="Lista de tarefas separadas por urgência, com prioridade e cliente relacionado.">
+      </div>
+    </div>
+
+    <div class="lp-feature">
+      <div class="lp-feature__text">
+        <h3>Números que mostram onde a venda escapa</h3>
+        <p>Quantos leads entraram, quantos viraram venda, de onde vieram e quanto
+           tempo levou para fechar.</p>
+        <ul class="lp-list">
+          <li>Leads por origem: WhatsApp, Instagram, indicação, anúncio</li>
+          <li>Desempenho por responsável</li>
+          <li>Motivos de perda e tempo médio até o fechamento</li>
+        </ul>
+      </div>
+      <div class="lp-shot">
+        <img src="assets/tour/relatorios.png" width="1440" height="900" loading="lazy"
+             alt="Relatórios com conversão, ticket médio, leads por origem e desempenho por responsável.">
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------- celular -->
+  <section class="lp-section lp-wrap">
+    <div class="lp-mobile">
+      <div class="lp-shot">
+        <img src="assets/tour/mobile.png" width="414" height="896" loading="lazy"
+             alt="O Prox CRM no celular, com menu inferior e os indicadores do dia.">
+      </div>
+      <div>
+        <span class="lp-eyebrow">No bolso</span>
+        <h2 style="font-size:clamp(1.4rem,3.2vw,2rem);letter-spacing:-.025em;margin-bottom:.6rem">
+          Feito para usar entre um atendimento e outro
+        </h2>
+        <p class="muted">Quem vende pelo WhatsApp está no celular o dia todo. O Prox
+           foi desenhado para isso: botões grandes e as ações mais comuns a um toque.</p>
+        <ul class="lp-list" style="margin-top:1rem">
+          <li>Achar o cliente e abrir o WhatsApp</li>
+          <li>Anotar o que foi combinado</li>
+          <li>Marcar o próximo follow-up</li>
+          <li>Mover a negociação de etapa</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ como começar -->
+  <section class="lp-section lp-wrap" id="comecar">
+    <div class="lp-section__head">
+      <span class="lp-eyebrow">Como começar</span>
+      <h2>Em três passos, hoje mesmo</h2>
+      <p>Sem instalação, sem integração obrigatória e sem cartão de crédito.</p>
+    </div>
+
+    <div class="lp-steps">
+      <article class="card lp-step">
+        <div class="lp-step__n">1</div>
+        <strong>Crie sua conta</strong>
+        <p>Com e-mail e senha ou pela conta Google. Depois dê um nome ao workspace
+           da sua empresa.</p>
+      </article>
+      <article class="card lp-step">
+        <div class="lp-step__n">2</div>
+        <strong>Traga seus contatos</strong>
+        <p>Cadastre um a um ou importe uma planilha em CSV — com uma etapa de
+           conferência antes de gravar.</p>
+      </article>
+      <article class="card lp-step">
+        <div class="lp-step__n">3</div>
+        <strong>Trabalhe o funil</strong>
+        <p>Mova os cards, registre o que foi conversado e agende o próximo retorno.
+           O painel cuida de lembrar você.</p>
+      </article>
+    </div>
+
+    <p class="muted center" style="margin-top:1.6rem;font-size:.9rem">
+      Quer só experimentar? Em <strong>Configurações › Dados</strong> há um botão que
+      cria leads e tarefas de exemplo para você navegar sem cadastrar nada.
+    </p>
+  </section>
+
+  <!-- --------------------------------------------------------- segurança -->
+  <section class="lp-section lp-wrap" id="seguranca">
+    <div class="lp-section__head">
+      <span class="lp-eyebrow">Segurança</span>
+      <h2>Os dados são seus e ficam separados</h2>
+    </div>
+
+    <div class="lp-pains">
+      <article class="card lp-pain">
+        <div class="lp-pain__icon" style="background:var(--brand-100);color:var(--brand)">
+          <span data-icon="people"></span>
+        </div>
+        <strong>Isolamento por empresa</strong>
+        <p>Cada workspace é uma caixa fechada. Nenhum usuário de outra empresa
+           alcança seus contatos — isso é garantido no próprio banco de dados,
+           não apenas na tela.</p>
+      </article>
+      <article class="card lp-pain">
+        <div class="lp-pain__icon" style="background:var(--brand-100);color:var(--brand)">
+          <span data-icon="check"></span>
+        </div>
+        <strong>Perfis de acesso</strong>
+        <p>O administrador vê tudo e gerencia a equipe. O vendedor trabalha com a
+           própria carteira de clientes e tarefas.</p>
+      </article>
+      <article class="card lp-pain">
+        <div class="lp-pain__icon" style="background:var(--brand-100);color:var(--brand)">
+          <span data-icon="gear"></span>
+        </div>
+        <strong>Credenciais fora do navegador</strong>
+        <p>As chaves das integrações ficam apenas no servidor. Nada de token
+           sensível trafegando na tela do usuário.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ chamada final -->
+  <section class="lp-wrap">
+    <div class="lp-cta">
+      <h2>Comece pelo próximo cliente que chamar</h2>
+      <p>Leva um minuto para criar a conta. A partir daí, nenhuma conversa
+         se perde no meio do caminho.</p>
+      <a class="btn btn--lg" href="index.html">Acessar o Prox CRM</a>
+    </div>
+  </section>
+</main>
+
+<footer class="lp-wrap">
+  <div class="lp-foot">
+    <div class="brand brand--sm" role="img" aria-label="Prox CRM">
+      <span class="brand__word" aria-hidden="true">PRO</span>
+      <span class="brand__x" aria-hidden="true"></span>
+    </div>
+    <span class="spacer"></span>
+    <span>Funil de vendas para quem atende pelo WhatsApp.</span>
+    <a href="index.html">Acessar o sistema</a>
+  </div>
+</footer>
+
+</body>
+</html>
