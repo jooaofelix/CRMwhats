@@ -9,10 +9,13 @@
   --logo-navy:    #0e2260;
   --logo-cyan:    #17b8d4;
 
-  --brand:        #0e2260;
-  --brand-600:    #071845;
-  --brand-100:    #e9edf7;
-  --brand-soft:   #cfd9ee;
+  /* O navy do logotipo e escuro demais para ser a cor de acao: usado em massa
+     ele deixa a interface pesada. A primaria e um azul vivo entre o navy e o
+     ciano da marca — mesma familia, muito mais presenca. */
+  --brand:        #1558d6;
+  --brand-600:    #0f44ab;
+  --brand-100:    #e3edfd;
+  --brand-soft:   #c3d8fa;
 
   --accent:       #10b981;   /* ganho / positivo */
   --accent-100:   #d1fae5;
@@ -55,10 +58,10 @@
   :root {
     /* O navy do logotipo desapareceria sobre o fundo escuro: no modo escuro a
        cor primaria e uma versao elevada dele, mantendo a familia. */
-    --brand:       #3358c4;
-    --brand-600:   #4a6ed6;
-    --brand-100:   #182242;
-    --brand-soft:  #24325e;
+    --brand:       #4d8bff;
+    --brand-600:   #6ea3ff;
+    --brand-100:   #14224a;
+    --brand-soft:  #1e3268;
     --accent-100:  #06301f;
     --warn-100:    #3a2a05;
     --danger-100:  #3a1414;
@@ -373,7 +376,7 @@ select { appearance: none; padding-right: 2rem;
 
 .auth { min-height: 100dvh; display: grid; grid-template-columns: 1.05fr 1fr; }
 .auth__brand {
-  background: linear-gradient(150deg, #0b1a4c 0%, #12306f 45%, var(--logo-cyan) 165%);
+  background: linear-gradient(150deg, #0e2260 0%, #1558d6 58%, var(--logo-cyan) 135%);
   color: #fff; padding: 3rem; display: flex; align-items: center; position: relative; overflow: hidden;
 }
 .auth__brand::after {

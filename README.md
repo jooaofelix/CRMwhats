@@ -84,7 +84,7 @@ CDN (`gstatic.com`) como módulo ES.
 │   ├── index.html             # shell da aplicação (login, onboarding e app)
 │   ├── manifest.webmanifest
 │   ├── _headers               # cabeçalhos de segurança
-│   ├── assets/logo.svg
+│   ├── assets/                # logo.svg (símbolo) + PNGs gerados do ícone
 │   ├── css/app.css            # design system completo (tokens, componentes, telas)
 │   └── js/
 │       ├── config.js          # CONFIGURAÇÃO — preencha aqui (só dados públicos)
@@ -532,6 +532,12 @@ garantia de que `/api/config` não vaza segredos de servidor.
 A validação de `firestore.indexes.json` roda junto: formato, ausência de
 índices de campo único, duplicatas, e a checagem de que toda consulta com
 filtro + ordenação tem um índice correspondente declarado.
+
+**Ícones:** os PNGs de `public/assets/` são gerados do `logo.svg` com
+`node test/e2e/gen-icons.mjs`. Ao trocar o logotipo, rode esse comando e
+incremente o `?v=` nos links do `index.html` e do manifesto — `/assets/*` é
+servido com cache de 7 dias, e sem o novo `v` o navegador continua mostrando
+o ícone antigo.
 
 **Frontend:** o fluxo completo do MVP foi validado em navegador real
 (Chromium via Playwright) com o SDK do Firebase substituído por um mock em
