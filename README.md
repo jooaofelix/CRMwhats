@@ -109,11 +109,15 @@ CDN (`gstatic.com`) como módulo ES.
 │   ├── src/jwt.js             # verificação de ID token, OAuth2 e HMAC da Meta
 │   └── test/worker.test.mjs   # testes sem rede (node --test)
 │
+├── test/
+│   ├── firestore-indexes.test.mjs  # valida os índices antes do deploy
+│   └── e2e/                   # fluxo completo em Chromium (Firebase simulado)
+│
 ├── wrangler.toml              # Worker + assets estáticos (fica na raiz)
 ├── .dev.vars.example          # modelo dos segredos para desenvolvimento local
 │
 ├── firestore.rules            # regras de segurança
-├── firestore.indexes.json     # índices compostos
+├── firestore.indexes.json     # índice composto da timeline
 └── firebase.json
 ```
 
@@ -236,10 +240,21 @@ firebase deploy --only firestore:rules
 firebase deploy --only firestore:indexes
 ```
 
-Os índices de `firestore.indexes.json` cobrem as consultas usadas hoje
-(timeline por contato, tarefas por status/vencimento, mensagens por data).
+`firestore.indexes.json` declara **um** índice composto: a timeline do contato
+(`where contactId == X` + `orderBy createdAt`). É a única consulta do projeto
+que combina filtro e ordenação — as demais telas filtram em memória, então o
+Firestore resolve tudo com os índices de campo único que ele já cria sozinho.
+
+Dois detalhes que valem lembrar:
+
+- **Não declare índices de campo único.** O Firestore os cria automaticamente e
+  rejeita a declaração com `HTTP 400 — this index is not necessary`, abortando o
+  deploy inteiro. O teste em `test/firestore-indexes.test.mjs` barra isso antes.
+- **Índice composto não usado não é neutro:** ele encarece toda escrita na
+  coleção. Por isso a lista é curta de propósito.
+
 Se o Firestore pedir um índice novo, o erro no console traz um link que o cria
-com um clique — o app também mostra um aviso amigável nesse caso.
+com um clique — e o app mostra um aviso amigável em vez de falhar em silêncio.
 
 ---
 
@@ -502,16 +517,21 @@ para que um gateway de pagamento seja plugado depois sem migração de dados.
 
 ## Testes
 
-**Worker** (sem rede, com `node --test`):
+**Worker e configuração** (sem rede, com `node --test`):
 
 ```bash
-node --test worker/test/worker.test.mjs
+npm test
 ```
 
 Cobre normalização de números (inclusive o nono dígito brasileiro), conversão
 de tipos do Firestore, assinatura HMAC do webhook (aceita a correta, recusa
 adulterada e com secret errado), CORS, verificação do webhook, recusa de envio
-sem autenticação e roteamento.
+sem autenticação, roteamento (incluindo `/api/*` nunca respondendo HTML) e a
+garantia de que `/api/config` não vaza segredos de servidor.
+
+A validação de `firestore.indexes.json` roda junto: formato, ausência de
+índices de campo único, duplicatas, e a checagem de que toda consulta com
+filtro + ordenação tem um índice correspondente declarado.
 
 **Frontend:** o fluxo completo do MVP foi validado em navegador real
 (Chromium via Playwright) com o SDK do Firebase substituído por um mock em

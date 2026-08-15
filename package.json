@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:static": "npx serve public",
-    "test": "node --test worker/test/worker.test.mjs",
+    "test": "node --test worker/test/worker.test.mjs test/firestore-indexes.test.mjs",
     "deploy": "wrangler deploy",
     "deploy:rules": "firebase deploy --only firestore:rules,firestore:indexes"
   },
