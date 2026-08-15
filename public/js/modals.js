@@ -523,8 +523,11 @@ export function openWonLostModal(contact, outcome, onDone) {
  * Escolhe um modelo, permite editar o texto e abre o WhatsApp com a mensagem
  * pronta. Tambem registra a mensagem no historico da conversa.
  */
-export function openTemplatePickerModal(contact, onDone) {
+export function openTemplatePickerModal(contactRef, onDone) {
   const templates = state.templates;
+  // Relê o contato do estado: o objeto recebido pode ter vindo de um render
+  // anterior (kanban, lista) e estar desatualizado.
+  const contact = contactById(contactRef.id) || contactRef;
   const number = contactNumber(contact);
 
   const body = `
@@ -563,10 +566,11 @@ export function openTemplatePickerModal(contact, onDone) {
     onConfirm: async (root) => {
       if (!number) return;
       const message = val(root, '#tp-text');
+      const current = contactById(contact.id) || contact;
 
       try {
-        await openWhatsApp(contact, message, { log: false });
-        await logOutgoingMessage(contact, message, { channel: 'manual' });
+        await openWhatsApp(current, message, { log: false });
+        await logOutgoingMessage(current, message, { channel: 'manual' });
         await addInteraction(contact.id, {
           type: 'mensagem',
           title: 'Mensagem enviada pelo WhatsApp',

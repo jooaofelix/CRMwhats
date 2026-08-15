@@ -47,9 +47,13 @@ export function renderForContact(body, contact) {
 
 /* ------------------------------------------------------------- nivel 1 --- */
 
-/** Numero utilizavel do contato (WhatsApp tem prioridade sobre telefone). */
+/**
+ * Numero utilizavel do contato, em E.164 sem "+".
+ * O WhatsApp tem prioridade sobre o telefone; `waNumber` (ja normalizado na
+ * gravacao) entra como ultima alternativa.
+ */
 export function contactNumber(contact) {
-  return toWhatsAppNumber(contact?.whatsapp || contact?.phone || '');
+  return toWhatsAppNumber(contact?.whatsapp || contact?.phone || contact?.waNumber || '');
 }
 
 /**

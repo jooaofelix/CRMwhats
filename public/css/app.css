@@ -560,19 +560,21 @@ table.data tbody tr:last-child td { border-bottom: 0; }
 /* ---------- 13. Kanban ---------- */
 .board {
   display: flex; gap: .8rem; overflow-x: auto; padding-bottom: .6rem;
-  scroll-snap-type: x proximity; align-items: flex-start;
+  scroll-snap-type: x proximity;
+  /* Colunas com a mesma altura: soltar um card numa coluna vazia fica fácil. */
+  align-items: stretch; min-height: 320px;
 }
 .column {
   width: 272px; flex: none; background: var(--surface-2); border: 1px solid var(--line);
   border-radius: var(--radius-lg); display: flex; flex-direction: column;
-  max-height: calc(100dvh - var(--topbar-h) - 130px); scroll-snap-align: start;
+  max-height: calc(100dvh - var(--topbar-h) - 130px); min-height: 320px; scroll-snap-align: start;
 }
 .column.is-over { border-color: var(--brand); background: var(--brand-100); }
 .column__head { padding: .7rem .8rem .5rem; display: flex; flex-direction: column; gap: .3rem; position: sticky; top: 0; }
 .column__title { display: flex; align-items: center; gap: .45rem; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 .column__count { margin-left: auto; font-size: .74rem; color: var(--text-3); font-weight: 600; }
 .column__total { font-size: .78rem; color: var(--text-2); font-weight: 600; }
-.column__body { padding: .35rem .5rem .6rem; overflow-y: auto; display: flex; flex-direction: column; gap: .5rem; min-height: 60px; }
+.column__body { padding: .35rem .5rem .6rem; overflow-y: auto; display: flex; flex-direction: column; gap: .5rem; flex: 1; min-height: 120px; }
 
 .kcard {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);

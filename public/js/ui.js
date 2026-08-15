@@ -161,10 +161,12 @@ export function openModal(opts) {
 
   onMount?.(modal, close);
 
-  // Foco no primeiro campo — evita um toque a mais no celular.
+  // Foco no primeiro campo (só no desktop; no celular abriria o teclado por cima
+  // da folha). O foco é aplicado de forma síncrona de propósito: um foco atrasado
+  // rouba o cursor de quem já começou a digitar e joga o texto no campo errado.
   const firstField = modal.querySelector('input:not([type=hidden]), textarea, select');
   if (firstField && window.matchMedia('(min-width: 901px)').matches) {
-    setTimeout(() => firstField.focus(), 40);
+    firstField.focus({ preventScroll: true });
   }
 
   return { close, root: modal };

@@ -12,7 +12,7 @@ import { openContactModal, openImportModal, openQuickActions } from '../modals.j
 let unsubscribe = null;
 
 /** Filtros preservados enquanto a tela existir. */
-const filters = { term: '', stage: '', owner: '', tag: '', source: '', status: 'abertos' };
+const filters = { term: '', stage: '', owner: '', tag: '', source: '', status: 'todos' };
 
 export function render(root) {
   root.innerHTML = shell();
@@ -49,8 +49,8 @@ function shell() {
         <input type="search" id="f-term" placeholder="Nome, telefone, empresa ou tag…" value="${esc(filters.term)}">
       </div>
       <select id="f-status">
-        <option value="abertos">Em aberto</option>
         <option value="todos">Todos</option>
+        <option value="abertos">Em aberto</option>
         <option value="ganho">Ganhos</option>
         <option value="perdido">Perdidos</option>
       </select>
