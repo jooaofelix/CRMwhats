@@ -101,16 +101,6 @@ export async function createCompany({ name, segment = '', userName }) {
 
   const companyName = clean(name, 120);
   const base = slugify(companyName) || 'workspace';
-
-  // ID legivel (aparece no codigo de convite) com sufixo aleatorio anticolisao.
-  let companyId = '';
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const candidate = `${base}-${randomCode(4).toLowerCase()}`;
-    const exists = await getDoc(doc(db, 'companies', candidate));
-    if (!exists.exists()) { companyId = candidate; break; }
-  }
-  if (!companyId) throw new Error('Não foi possível gerar um identificador para o workspace.');
-
   const joinCode = randomCode(6);
   const company = {
     name: companyName,
@@ -125,7 +115,29 @@ export async function createCompany({ name, segment = '', userName }) {
     updatedAt: now()
   };
 
-  await setDoc(doc(db, 'companies', companyId), company);
+  // ID legivel (aparece no codigo de convite e na URL do webhook) com sufixo
+  // aleatorio anticolisao.
+  //
+  // Nao da para checar antes se o id ja existe: ler companies/{id} exige ser
+  // membro, entao a verificacao seria negada pelas regras. Em vez disso
+  // tentamos criar — se o documento ja existir, a escrita vira um update, que
+  // as regras negam — e sorteamos outro sufixo. Com 6 caracteres o segundo
+  // sorteio praticamente nunca acontece.
+  let companyId = '';
+  const MAX_TENTATIVAS = 5;
+  for (let attempt = 1; attempt <= MAX_TENTATIVAS; attempt++) {
+    const candidate = `${base}-${randomCode(6).toLowerCase()}`;
+    try {
+      await setDoc(doc(db, 'companies', candidate), company);
+      companyId = candidate;
+      break;
+    } catch (err) {
+      const colisaoProvavel = err?.code === 'permission-denied' && attempt < MAX_TENTATIVAS;
+      if (!colisaoProvavel) throw err;
+      console.warn('[data] identificador em uso, sorteando outro', candidate);
+    }
+  }
+  if (!companyId) throw new Error('Não foi possível criar o workspace. Tente novamente.');
 
   await setDoc(doc(db, 'companies', companyId, 'members', user.uid), {
     uid: user.uid,
@@ -191,10 +203,23 @@ export async function joinCompany(fullCode, userName) {
 export async function loadWorkspace(companyId) {
   if (!companyId) return false;
 
-  const [companySnap, memberSnap] = await Promise.all([
-    getDoc(doc(db, 'companies', companyId)),
-    getDoc(doc(db, 'companies', companyId, 'members', state.user.uid))
-  ]);
+  // Ler companies/{id} exige ser membro. Quem perdeu o acesso (ou tem um
+  // companyId antigo no perfil) recebe permission-denied — nesse caso o certo
+  // e devolver false e cair no onboarding, nao derrubar a sessao.
+  let companySnap;
+  let memberSnap;
+  try {
+    [companySnap, memberSnap] = await Promise.all([
+      getDoc(doc(db, 'companies', companyId)),
+      getDoc(doc(db, 'companies', companyId, 'members', state.user.uid))
+    ]);
+  } catch (err) {
+    if (err?.code === 'permission-denied') {
+      console.warn('[data] sem acesso ao workspace', companyId);
+      return false;
+    }
+    throw err;
+  }
 
   if (!companySnap.exists() || !memberSnap.exists()) return false;
 

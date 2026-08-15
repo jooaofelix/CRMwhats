@@ -97,7 +97,31 @@ function snapshotFor(path) {
   };
 }
 
-export async function getDoc(ref) { return snapshotFor(ref.path); }
+/**
+ * Reproduz a regra `match /companies/{id} { allow read: if isMember(id) }`.
+ *
+ * É a única regra replicada aqui, e existe por um motivo concreto: sem ela o
+ * mock aceitava leituras que o Firestore real nega, e um bug de permissão só
+ * aparecia em produção (o cadastro de workspace chegou a quebrar por ler
+ * companies/{id} antes de o usuário ser membro).
+ */
+function aplicarRegraDeLeitura(path) {
+  const match = /^companies\/([^/]+)$/.exec(path);
+  if (!match) return;
+
+  const uid = localStorage.getItem('__mock_session__');
+  const membro = uid ? store[`companies/${match[1]}/members/${uid}`] : undefined;
+  if (membro !== undefined) return;
+
+  const erro = new Error('Missing or insufficient permissions.');
+  erro.code = 'permission-denied';
+  throw erro;
+}
+
+export async function getDoc(ref) {
+  aplicarRegraDeLeitura(ref.path);
+  return snapshotFor(ref.path);
+}
 
 export async function setDoc(ref, data, options = {}) {
   const payload = serialize(data);

@@ -322,7 +322,9 @@ function setupOnboardingScreen() {
       location.reload();
     } catch (err) {
       console.error('[onboarding]', err);
-      showError(err?.code === 'permission-denied'
+      // "permission-denied" só significa código inválido quando o usuário
+      // estava mesmo entrando por convite.
+      showError(mode === 'join' && err?.code === 'permission-denied'
         ? 'Código de convite inválido ou expirado.'
         : describeError(err));
       submit.disabled = false;
